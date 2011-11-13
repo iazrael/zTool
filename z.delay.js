@@ -1,3 +1,6 @@
+/**
+ * setTimout 的封装, 用于输入检测等触发过快的事件/方法处理
+ */
 ;Z.$package('Z', function(z){
     
     var DELAY_STATUS = {
@@ -56,4 +59,7 @@
         }
         return DELAY_STATUS.ID_NOT_EXIST;
     }
+    
+    this.delay = delay;
+    this.clearDelay = clearDelay;
 });

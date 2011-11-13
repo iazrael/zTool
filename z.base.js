@@ -1,4 +1,4 @@
-;(function(window, undefined){
+;(function(undefined){
     var PACKAGE_STATUS = {
         UNDEFINED: 0,
         BUILDED: 1,
@@ -6,18 +6,17 @@
         INITED: 3
     };
     var LIBRARY_NAME = 'Z';
+    var isDebuging = 0;
     
     var packageList = {};
     var dependenceQueue = {};
     
     var emptyFunction = function(){};
     
-    var console = /* window.console || */ {
-        log: emptyFunction,
-        debug: emptyFunction,
-        error: emptyFunction
-    };
-    
+    var debug = isDebuging ? (window.console ? function(data){
+        console.debug ? console.debug(data) : console.log(data);
+    } : emptyFunction) : emptyFunction;
+       
     /**
      * @param {String} packageName
      */
@@ -40,7 +39,7 @@
         if(!('packageStatus' in pack)){
             pack.packageStatus = PACKAGE_STATUS.BUILDED;
         }
-        console.log('buildPackage: ' + packageName);
+        debug('buildPackage: ' + packageName);
         return pack;
     };
     
@@ -76,10 +75,10 @@
                 require[r] = getPackage(requirePackages[r]);
             }
         }
-        console.log('initPackage: ' + pack.packageName);
+        debug('initPackage: ' + pack.packageName);
         if(constructor){
             constructor.call(pack, library, require);
-            console.log('>>>' + pack.packageName + ' inited');
+            debug('[[' + pack.packageName + ' inited]]');
         }
         pack.packageStatus = PACKAGE_STATUS.INITED;
         runDependenceQueue(pack.packageName);
@@ -92,7 +91,7 @@
         var requirePackageName;
         for(var r in requirePackages){
             requirePackageName = requirePackages[r];
-            if(!getPackageStatus(requirePackageName) === PACKAGE_STATUS.INITED){
+            if(getPackageStatus(requirePackageName) !== PACKAGE_STATUS.INITED){
                 return false;
             }
         }
@@ -100,7 +99,7 @@
     };
     
     var addToDependenceQueue = function(packageName, requirePackages, constructor){
-        console.log('addToDependenceQueue, package: ' + packageName);
+        debug('>>>addToDependenceQueue, package: ' + packageName);
         var requirePackageName;
         for(var r in requirePackages){
             requirePackageName = requirePackages[r];
@@ -120,7 +119,7 @@
         if(!requireQueue){
             return false;
         }
-        console.log('runDependenceQueue, dependented package: ' + packageName);
+        debug('<<<runDependenceQueue, dependented package: ' + packageName);
         var flag = false, require;
         for(var r = 0; r < requireQueue.length; r++ ){
             require = requireQueue[r];
@@ -168,4 +167,4 @@
         
     });
     
-})(window);
+})();
