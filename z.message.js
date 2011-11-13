@@ -4,20 +4,21 @@
  * 当有指定消息到达时触发
  */
 ;Z.$package('Z.message', function(z){
-    
+    var IE_CUSTOM_EVENT = 'onpropertychange';
+    var IE_EVENT_ELEMENT_STYLE = 'position: absolute; top: -9999em; left: -9999em; width: 0px; height: 0px;';
     var listenerList = {};
     
-    var executeElement;
+    var eventElement;
     
-    var getExecuteElement = function(){
-        if(!executeElement){
-            executeElement = document.createElement('div');
+    var getEventElement = function(){
+        if(!eventElement){
+            eventElement = document.createElement('div');
             if(!document.createEvent){
-                executeElement.style.cssText = 'position: absolute; top: -9999em; left: -9999em; width: 0px; height: 0px;';
-                document.body.appendChild(executeElement);
+                eventElement.style.cssText = IE_EVENT_ELEMENT_STYLE;
+                document.body.appendChild(eventElement);
             }
         }
-        return executeElement;
+        return eventElement;
     }
     
     /**
@@ -40,7 +41,7 @@
                 }
             }
         }
-        element = getExecuteElement();
+        element = getEventElement();
         if(element.addEventListener){
             wrapFunc = function(e){
                 func.apply(window, e.params);
@@ -49,12 +50,13 @@
         }else{
             wrapFunc = function(e){
                 e = window.event;
-                //TODO onpropertychange 触发的事件执行顺序倒过来了
-                if(type === e.propertyName){
+                //TODO ie8及以下的浏览器后绑定的方法先执行, 导致触发的事件执行顺序倒过来了
+                //没精力去自己实现顺序执行, 先这样吧
+                if(type === e.params[0]){
                     func.apply(window, e.params);
                 }
             }
-            element.attachEvent('onpropertychange', wrapFunc);
+            element.attachEvent(IE_CUSTOM_EVENT, wrapFunc);
         }
         listener = {
             func: func,
@@ -74,14 +76,14 @@
         if(!listenerList[type]){
             return false;
         }
-        element = getExecuteElement();
+        element = getEventElement();
         if(!func){
             for(var i in listenerList[type]){
                 listener = listenerList[type][i];
                 if(element.removeEventListener){
                     element.removeEventListener(type, listener.wrapFunc, false);
                 }else{
-                    //TODO
+                    element.detachEvent(IE_CUSTOM_EVENT, listener.wrapFunc);
                 }
             }
             listenerList[type] = null;
@@ -95,7 +97,7 @@
                 if(element.removeEventListener){
                     element.removeEventListener(type, listener.wrapFunc, false);
                 }else{
-                    //TODO
+                    element.detachEvent(IE_CUSTOM_EVENT, listener.wrapFunc);
                 }
                 return true;
             }
@@ -114,17 +116,16 @@
         if(!listenerList[type]){
             return false;
         }
-        element = getExecuteElement();
+        element = getEventElement();
         if(document.createEvent){
             event = document.createEvent('Events');
             event.initEvent(type, false, false);
             event.params = [type, message];
             element.dispatchEvent(event);
         }else{
-            event = document.createEventObject('onpropertychange');
-            event.propertyName = type;
+            event = document.createEventObject(IE_CUSTOM_EVENT);
             event.params = [type, message];
-            element.fireEvent('onpropertychange', event);
+            element.fireEvent(IE_CUSTOM_EVENT, event);
         }
         return listenerList[type].length !== 0;
     }
