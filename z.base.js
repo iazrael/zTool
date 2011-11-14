@@ -6,13 +6,13 @@
         INITED: 3
     };
     var LIBRARY_NAME = 'Z';
-    var isDebuging = 0;
     
     var packageList = {};
     var dependenceQueue = {};
     
     var emptyFunction = function(){};
     
+    var isDebuging = 0;
     var debug = isDebuging ? (window.console ? function(data){
         console.debug ? console.debug(data) : console.log(data);
     } : emptyFunction) : emptyFunction;

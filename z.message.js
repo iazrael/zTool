@@ -6,9 +6,16 @@
 ;Z.$package('Z.message', function(z){
     var IE_CUSTOM_EVENT = 'onpropertychange';
     var IE_EVENT_ELEMENT_STYLE = 'position: absolute; top: -9999em; left: -9999em; width: 0px; height: 0px;';
-    var listenerList = {};
     
+    var listenerList = {};
     var eventElement;
+    
+    var emptyFunction = function(){};
+    
+    var isDebuging = 1;
+    var debug = isDebuging ? (window.console ? function(data){
+        console.debug ? console.debug(data) : console.log(data);
+    } : emptyFunction) : emptyFunction;
     
     var getEventElement = function(){
         if(!eventElement){
@@ -113,6 +120,7 @@
     var notify = function(type, message){
         var element;
         var event;
+        debug('notify message: ' + type);
         if(!listenerList[type]){
             return false;
         }
