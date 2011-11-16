@@ -10,13 +10,6 @@
     var listenerList = {};
     var eventElement;
     
-    var emptyFunction = function(){};
-    
-    var isDebuging = 1;
-    var debug = isDebuging ? (window.console ? function(data){
-        console.debug ? console.debug(data) : console.log(data);
-    } : emptyFunction) : emptyFunction;
-    
     var getEventElement = function(){
         if(!eventElement){
             eventElement = document.createElement('div');
@@ -59,7 +52,7 @@
                 e = window.event;
                 //TODO ie8及以下的浏览器后绑定的方法先执行, 导致触发的事件执行顺序倒过来了
                 //没精力去自己实现顺序执行, 先这样吧
-                if(type === e.params[0]){
+                if(type === e.params[1]){
                     func.apply(window, e.params);
                 }
             }
@@ -120,7 +113,7 @@
     var notify = function(type, message){
         var element;
         var event;
-        debug('notify message: ' + type);
+        z.debug('notify message: ' + type);
         if(!listenerList[type]){
             return false;
         }
@@ -128,11 +121,11 @@
         if(document.createEvent){
             event = document.createEvent('Events');
             event.initEvent(type, false, false);
-            event.params = [type, message];
+            event.params = [message, type];
             element.dispatchEvent(event);
         }else{
             event = document.createEventObject(IE_CUSTOM_EVENT);
-            event.params = [type, message];
+            event.params = [message, type];
             element.fireEvent(IE_CUSTOM_EVENT, event);
         }
         return listenerList[type].length !== 0;

@@ -1,12 +1,6 @@
 
 ;Z.$package('Z', function(z){
     
-    var emptyFunction = function(){};
-    
-    var log = window.console ? function(data){
-        console.log(data);
-    } : emptyFunction;
-    
     var timeTaken = function(func){
         var name = '>>>', beforeCb, afterCb;
         if(arguments.length === 2){
@@ -19,13 +13,13 @@
             beforeCb = arguments[1];
             afterCb = arguments[2];
         }
-        log(name + ' time test start.');
+        z.debug(name + ' time test start.');
         beforeCb && beforeCb();
         var start = +new Date;
         func();
         var taken = +new Date - start;
         afterCb && afterCb(taken);
-        log(name + ' time test end. time taken: ' + taken);
+        z.debug(name + ' time test end. time taken: ' + taken);
     }
     
     this.timeTaken = timeTaken;
