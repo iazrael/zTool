@@ -1,7 +1,5 @@
 /**
- * @namespace Z.message
- * zTool 使用全局的消息通知机制, 需要监听消息的模块调用addListener注册一个回调函数,
- * 当有指定消息到达时触发
+ * 这个包是用 settimeout 来执行观察者方法, 跟自定义事件的方法做对比
  */
 ;Z.$package('Z.message', function(z){
     
