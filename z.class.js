@@ -1,7 +1,9 @@
 
 ;Z.$package('Z', function(z){
     
-    // 合并几个对象
+    /**
+	 * 合并几个对象
+	 **/
     var merge = function(baseObj, extendObj1, extendObj2/*, extnedObj3...*/){
         var argu = arguments;
         var extendObj;
@@ -24,7 +26,11 @@
         }
         return baseObj;
     }
-    //定义类
+    /**
+	 * 定义类
+	 * @param {Object} option , 可指定 extend 和 implements
+	 * @param {Object} prototype, 原型链, 必须要有 init 方法
+	 **/
     var defineClass = function(option, prototype){
         if(arguments.length === 1){
             prototype = option;
@@ -65,7 +71,9 @@
         return newClass;
     }
     
-    //判断一个类是否是接口
+    /**
+	 * 判断传入类是否是接口
+	 **/
     var isInterface = function(cls){
         if(cls.type === 'interface' && 
             cls.methods.constructor === Array && 
@@ -76,6 +84,9 @@
         return false;
     }
     
+	/**
+	 * 定义接口
+	 **/
     var defineInterface = function(methods){
         var newInterface = function(){
             throw new Error('the interface can not be Instantiated!');
@@ -95,7 +106,9 @@
         return newInterface;
     }
     
-    //定义类或接口
+    /**
+	 * 定义类或接口
+	 **/
     var define = function(type, option, prototype){
         var args = Array.prototype.slice.call(arguments, 1);
         if(type === 'class'){

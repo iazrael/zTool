@@ -1,7 +1,7 @@
 /**
  * setTimout 的封装, 用于输入检测等触发过快的事件/方法处理
  */
-;Z.$package('Z', function(z){
+;Z.$package('Z.util', function(z){
     
     var DELAY_STATUS = {
         NORMAL: 0,
