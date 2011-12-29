@@ -28,7 +28,12 @@
     }
     /**
 	 * 定义类
-	 * @param {Object} option , 可指定 extend 和 implements
+	 * @param {Object} option , 可指定 extend 和 implements, statics
+     * {extend: {Class}, //继承的父类
+     * implements: [{Interface}],//所实现的接口
+     * statics: {{String}: {Function}||{Object}},//定义的静态变量和方法
+     * }
+     * 
 	 * @param {Object} prototype, 原型链, 必须要有 init 方法
 	 **/
     var defineClass = function(option, prototype){
@@ -49,6 +54,7 @@
             }
             var superInit = superClass.prototype.init;
             var subInit = prototype.init;
+            //TODO 实例如何调用父类被重写的方法?
             newClass.prototype = merge({}, superClass.prototype, prototype);
             newClass.prototype.init = function(){
                 superInit.apply(this, arguments);
@@ -57,16 +63,19 @@
         }else{
             newClass.prototype = prototype;
         }
-        var implements = option.implements;
-        if(implements){
+        var impls = option['implements'];
+        if(impls){
             var unImplMethods = [], implCheckResult;
-            for(var i in implements){
-                implCheckResult = implements[i].checkImplements(newClass.prototype);
+            for(var i in impls){
+                implCheckResult = impls[i].checkImplements(newClass.prototype);
                 unImplMethods = unImplMethods.concat(implCheckResult);
             }
             if(unImplMethods.length){
                 throw new Error('the interface\'s methods have not implemented. [' + unImplMethods + ']');
             }
+        }
+        if(option.statics){
+            merge(newClass, option.statics);
         }
         return newClass;
     }
@@ -94,7 +103,7 @@
         newInterface.type = 'interface'
         newInterface.methods = methods;
         newInterface.checkImplements = function(instance){
-            var unImplMethods = [];
+            var unImplMethods = [], impl;
             for(var i in methods){
                 impl = instance[methods[i]];
                 if(!impl || typeof(impl) !== 'function'){
@@ -122,7 +131,7 @@
     this.merge = merge;
     this.define = define;
     
-   /*  //test code
+    /* //test code
     var A = define('class', {
         init: function(){
             console.log('A init');
@@ -132,7 +141,12 @@
         }
     });
     
-    var B = define('class', { extend: A }, {
+    var B = define('class', { extend: A , statics: {
+        kill: function(){
+            alert('kill B');
+        }
+        
+    }}, {
         init: function(){
             console.log('B init');
         },
@@ -146,7 +160,7 @@
         'bar'
     ]);
     
-    var D = define('class', { extend: B, implements: [ C ]}, {
+    var D = define('class', { extend: B, 'implements': [ C ]}, {
         init: function(){
             console.log('D init');
         },
@@ -164,8 +178,9 @@
     // var b = new B();
     // console.log(b);
     // console.log(b.constructor);
-    
+//    console.log(B);
     var d = new D();
+    console.log(D);
     console.log(d);
     console.log(d.constructor); */
 });
