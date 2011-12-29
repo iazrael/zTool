@@ -63,6 +63,8 @@
         }else{
             newClass.prototype = prototype;
         }
+        newClass.type = 'class';
+        newClass.className = option.name || 'anonymous';
         var impls = option['implements'];
         if(impls){
             var unImplMethods = [], implCheckResult;
@@ -71,7 +73,7 @@
                 unImplMethods = unImplMethods.concat(implCheckResult);
             }
             if(unImplMethods.length){
-                throw new Error('the interface\'s methods have not implemented. [' + unImplMethods + ']');
+                throw new Error('the \'' + newClass.className + '\' class hasn\'t implemented the interfaces\'s methods . [' + unImplMethods + ']');
             }
         }
         if(option.statics){
@@ -96,11 +98,16 @@
 	/**
 	 * 定义接口
 	 **/
-    var defineInterface = function(methods){
+    var defineInterface = function(option, methods){
+        if(arguments.length === 1){
+            methods = option;
+            option = {};
+        }
         var newInterface = function(){
             throw new Error('the interface can not be Instantiated!');
         }
         newInterface.type = 'interface'
+        newInterface.interfaceName = option.name || 'anonymous';
         newInterface.methods = methods;
         newInterface.checkImplements = function(instance){
             var unImplMethods = [], impl;
@@ -117,6 +124,46 @@
     
     /**
 	 * 定义类或接口
+     * @example
+     * var A = define('class', {
+            init: function(){
+                console.log('A init');
+            },
+            alertA: function(){
+                alert('A');
+            }
+        });
+        
+        var B = define('class', { extend: A , statics: {
+            kill: function(){
+                alert('kill B');
+            }
+            
+        }}, {
+            init: function(){
+                console.log('B init');
+            },
+            alertB: function(){
+                alert('B');
+            }
+        });
+        
+        var C = define('interface', [
+            'foo',
+            'bar'
+        ]);
+        
+        var D = define('class', { extend: B, 'implements': [ C ]}, {
+            init: function(){
+                console.log('D init');
+            },
+            foo: function(){
+                console.log('foooooo');
+            },
+            bar: function(){
+            }
+        });
+     *
 	 **/
     var define = function(type, option, prototype){
         var args = Array.prototype.slice.call(arguments, 1);
