@@ -1,8 +1,32 @@
 
 ;Z.$package('Z', function(z){
     
+    var toString = Object.prototype.toString;
+    
+    var isArray = function(obj){
+        return toString.call(obj) === '[object Array]';
+    }
+    
+    var isArguments = function(obj){
+        return toString.call(obj) === '[object Arguments]';
+    }
+    
+    var isObject = function(obj){
+        return toString.call(obj) === '[object Object]';
+    }
+    
+    var isFunction = function(obj){
+        return toString.call(obj) === '[object Function]';
+    }
+    
     /**
-	 * 合并几个对象
+	 * 合并几个对象并返回 baseObj,
+     * 如果 extendObj 有数组属性, 则直接拷贝引用
+     * @param {Object} baseObj 基础对象
+     * @param {Object} extendObj ... 
+     * 
+     * @return {Object} a new baseObj
+     * 
 	 **/
     var merge = function(baseObj, extendObj1, extendObj2/*, extnedObj3...*/){
         var argu = arguments;
@@ -10,11 +34,11 @@
         for(var i = 1; i < argu.length; i++){
             extendObj = argu[i];
             for(var j in extendObj){
-                if(extendObj[j].constructor === Array){
+                if(isArray(extendObj[j])){
                     baseObj[j] = extendObj[j].concat();
-                }else if(extendObj[j].constructor === Object){
-                    if(baseObj[j] && baseObj[j].constructor === Array){
-                    //避免给数组做merge
+                }else if(isObject(extendObj[j])){
+                    if(baseObj[j] && isArray(baseObj[j])){
+                    //避免给数组做 merge
                         baseObj[j] = merge({}, extendObj[j]);
                     }else{
                         baseObj[j] = merge({}, baseObj[j], extendObj[j]);
@@ -26,6 +50,28 @@
         }
         return baseObj;
     }
+    
+    /**
+     * 把传入的对象或数组或者参数对象(arguments)复制一份
+     * @param {Object}, {Array}
+     * @return {Object}, {Array} 一个新的对象或数组
+     */
+    var duplicate = function(obj){
+        if(isArray(obj)){
+            return obj.concat();
+        }else if(isArguments(obj)){
+            var result = [];
+            for(var a = 0, p; p = obj[a]; a++){
+                result.push(duplicate(p));
+            }
+            return result;
+        }else if(isObject(obj)){
+            return merge({}, obj);
+        }else{
+            throw new Error('the argument isn\'t an object or array');
+        }
+    }
+    
     /**
 	 * 定义类
 	 * @param {Object} option , 可指定 extend 和 implements, statics
@@ -53,12 +99,26 @@
                 throw new Error('can not extend a interface!');
             }
             var superInit = superClass.prototype.init;
-            var subInit = prototype.init;
-            //TODO 实例如何调用父类被重写的方法?
+            var superPrototype = duplicate(superClass.prototype);
+            delete superPrototype.init;
             newClass.prototype = merge({}, superClass.prototype, prototype);
             newClass.prototype.init = function(){
-                superInit.apply(this, arguments);
-                subInit.apply(this, arguments);
+                var argus = duplicate(arguments);
+                superInit.apply(this, argus);
+                argus = duplicate(arguments);
+                prototype.init.apply(this, argus);
+                //把父类被重写的方法赋给子类实例
+                var that = this;
+                this.superClass = {};//TODO 这里有问题, 不能向上找父类的父类
+                for(var prop in superPrototype){
+                    if(isFunction(superPrototype[prop]) && prototype[prop]){
+                        this.superClass[prop] = (function(prop){
+                            return function(){
+                                superPrototype[prop].apply(that, arguments);
+                            }
+                        })(prop);
+                    }
+                }
             }
         }else{
             newClass.prototype = prototype;
@@ -86,10 +146,7 @@
 	 * 判断传入类是否是接口
 	 **/
     var isInterface = function(cls){
-        if(cls.type === 'interface' && 
-            cls.methods.constructor === Array && 
-            cls.checkImplements.constructor === Function )
-        {
+        if(cls.type === 'interface' && isArray(cls.methods) && isFunction(cls.checkImplements)){
             return true;
         }
         return false;
@@ -180,11 +237,15 @@
     
     /* //test code
     var A = define('class', {
-        init: function(){
+        init: function(option){
             console.log('A init');
+            console.log(arguments);
         },
         alertA: function(){
             alert('A');
+        },
+        foo: function(){
+            console.log('a foo');
         }
     });
     
@@ -194,11 +255,18 @@
         }
         
     }}, {
-        init: function(){
+        init: function(option){
             console.log('B init');
+            option.b='c';
         },
         alertB: function(){
             alert('B');
+        },
+        bar: function(){
+            console.log('b bar');
+        },
+        foo: function(){
+            console.log('b foo');
         }
     });
     
@@ -210,6 +278,7 @@
     var D = define('class', { extend: B, 'implements': [ C ]}, {
         init: function(){
             console.log('D init');
+            console.log(arguments);
         },
         foo: function(){
             console.log('foooooo');
@@ -226,8 +295,8 @@
     // console.log(b);
     // console.log(b.constructor);
 //    console.log(B);
-    var d = new D();
-    console.log(D);
+    var d = new D({'a': 123});
+//    console.log(D);
     console.log(d);
     console.log(d.constructor); */
 });

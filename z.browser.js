@@ -26,13 +26,29 @@ Z.$package('Z.browser', function(z){
         chrome: 'Webkit',
         safari: 'Webkit'
     };
-    var getPrivatePrefix = function(){
-        return privatePrefixs[browser.name];
+    var getPrivatePrefix = function(browserName){
+        return privatePrefixs[browserName || z.browser.name];
     };
-
-    var cssSupport = function(property, checkPrivate, value){
-        var element = document.createElement('div');
-        if(property in element.style){
+    
+    var checkerElement;
+    
+    var getCheckerElement = function(){
+        if(!checkerElement){
+            checkerElement = document.createElement('div');
+        }
+        return checkerElement;
+    }
+    
+    /**
+     * 检测 css 的支持
+     * @param {String} property 指定需要检测的属性
+     * @param {String} value 检测是否支持指定值 @optional
+     * @param {Boolean} checkPrivate 指定是否尝试检测浏览器的私有支持 @default false @optional
+     */
+    var cssSupport = function(property, value, checkPrivate){
+        throw new Error('not support');
+        var element = getCheckerElement();
+        if(property in element.style){//TODO 不够完善
             element.style[property] = value;
             return element.style[property] === value;
         }else if(checkPrivate){
@@ -43,5 +59,7 @@ Z.$package('Z.browser', function(z){
             return false;
         }
     }
+    
+    this.cssSupport = cssSupport;
     
 });

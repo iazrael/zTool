@@ -14,12 +14,13 @@
      * @param {String} id @optional
      * @param {Number} time @optional
      * @param {Function} func
+     * @param {Function} onClearFunc @optional
      * @example
      * 1. delay('id01', 1000, func)
      * 2. delay(1000, func)
      * 3. delay(func) === delay(0, func)
      */
-    var delay = function(id, time, func){
+    var delay = function(id, time, func, onClearFunc){
         var argu = arguments;
         var flag = DELAY_STATUS.NORMAL;
         if(argu.length === 1){
