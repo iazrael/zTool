@@ -19,6 +19,10 @@
         return toString.call(obj) === '[object Function]';
     }
     
+    var isUndefined = function(obj){
+        return toString.call(obj) === '[object Undefined]';
+    }
+    
     /**
 	 * 合并几个对象并返回 baseObj,
      * 如果 extendObj 有数组属性, 则直接拷贝引用

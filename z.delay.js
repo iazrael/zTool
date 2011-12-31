@@ -20,7 +20,7 @@
      * 2. delay(1000, func)
      * 3. delay(func) === delay(0, func)
      */
-    var delay = function(id, time, func, onClearFunc){
+    var delay = function(id, time, func, onClearFunc/*TODO 未实现*/){
         var argu = arguments;
         var flag = DELAY_STATUS.NORMAL;
         if(argu.length === 1){
