@@ -44,7 +44,7 @@ Z.$package('Z.dom', function(z){
     this.getTemplate = function(tmplId){
         var tmpl = templateList[tmplId];
         if(!tmpl){
-            var tmplNode = $D.id(tmplId);
+            var tmplNode = document.getElementById(tmplId);
             tmpl = tmplNode.innerHTML;
             tmplNode.parentNode.removeChild(tmplNode);
             templateList[tmplId] = tmpl;
