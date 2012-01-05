@@ -1,28 +1,6 @@
 
 ;Z.$package('Z', function(z){
     
-    var toString = Object.prototype.toString;
-    
-    var isArray = function(obj){
-        return toString.call(obj) === '[object Array]';
-    }
-    
-    var isArguments = function(obj){
-        return toString.call(obj) === '[object Arguments]';
-    }
-    
-    var isObject = function(obj){
-        return toString.call(obj) === '[object Object]';
-    }
-    
-    var isFunction = function(obj){
-        return toString.call(obj) === '[object Function]';
-    }
-    
-    var isUndefined = function(obj){
-        return toString.call(obj) === '[object Undefined]';
-    }
-    
     /**
 	 * 合并几个对象并返回 baseObj,
      * 如果 extendObj 有数组属性, 则直接拷贝引用
@@ -38,10 +16,10 @@
         for(var i = 1; i < argu.length; i++){
             extendObj = argu[i];
             for(var j in extendObj){
-                if(isArray(extendObj[j])){
+                if(z.isArray(extendObj[j])){
                     baseObj[j] = extendObj[j].concat();
-                }else if(isObject(extendObj[j])){
-                    if(baseObj[j] && isArray(baseObj[j])){
+                }else if(z.isObject(extendObj[j])){
+                    if(baseObj[j] && z.isArray(baseObj[j])){
                     //避免给数组做 merge
                         baseObj[j] = merge({}, extendObj[j]);
                     }else{
@@ -61,15 +39,15 @@
      * @return {Object}, {Array} 一个新的对象或数组
      */
     var duplicate = function(obj){
-        if(isArray(obj)){
+        if(z.isArray(obj)){
             return obj.concat();
-        }else if(isArguments(obj)){
+        }else if(z.isArguments(obj)){
             var result = [];
             for(var a = 0, p; p = obj[a]; a++){
                 result.push(duplicate(p));
             }
             return result;
-        }else if(isObject(obj)){
+        }else if(z.isObject(obj)){
             return merge({}, obj);
         }else{
             throw new Error('the argument isn\'t an object or array');
@@ -115,7 +93,7 @@
                 var that = this;
                 this.superClass = {};//TODO 这里有问题, 不能向上找父类的父类
                 for(var prop in superPrototype){
-                    if(isFunction(superPrototype[prop]) && prototype[prop]){
+                    if(z.isFunction(superPrototype[prop]) && prototype[prop]){
                         this.superClass[prop] = (function(prop){
                             return function(){
                                 superPrototype[prop].apply(that, arguments);
@@ -150,7 +128,7 @@
 	 * 判断传入类是否是接口
 	 **/
     var isInterface = function(cls){
-        if(cls.type === 'interface' && isArray(cls.methods) && isFunction(cls.checkImplements)){
+        if(cls.type === 'interface' && z.isArray(cls.methods) && z.isFunction(cls.checkImplements)){
             return true;
         }
         return false;
