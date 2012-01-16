@@ -2,7 +2,7 @@
  * setTimout 的封装, 延时执行一个方法, 并提供取消接口
  * 用于输入检测等触发过快的事件/方法处理
  */
-;Z.$package('Z', function(z){
+;Z.$package('Z.util', function(z){
     
     var DELAY_STATUS = {
         NORMAL: 0,
@@ -15,12 +15,13 @@
      * @param {String} id @optional
      * @param {Number} time @optional
      * @param {Function} func
+     * @param {Function} onClearFunc @optional
      * @example
      * 1. delay('id01', 1000, func)
      * 2. delay(1000, func)
      * 3. delay(func) === delay(0, func)
      */
-    var delay = function(id, time, func){
+    var delay = function(id, time, func, onClearFunc/*TODO 未实现*/){
         var argu = arguments;
         var flag = DELAY_STATUS.NORMAL;
         if(argu.length === 1){
