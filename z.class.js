@@ -89,9 +89,10 @@
                 superInit.apply(this, argus);
                 argus = duplicate(arguments);
                 prototype.init.apply(this, argus);
-                //把父类被重写的方法赋给子类实例
+                //把父类被重写的方法赋给子类实例, 未重写的不处理
                 var that = this;
                 this.superClass = {};//TODO 这里有问题, 不能向上找父类的父类
+                //TODO 或者提供直接使用 superPrototype 的配置?
                 for(var prop in superPrototype){
                     if(z.isFunction(superPrototype[prop]) && prototype[prop]){
                         this.superClass[prop] = (function(prop){
@@ -108,7 +109,7 @@
         newClass.type = 'class';
         newClass.className = option.name || 'anonymous';
         var impls = option['implements'];
-        if(impls){
+        if(impls){//TODO implements 的检查是否可以放到实例化的时候?
             var unImplMethods = [], implCheckResult;
             for(var i in impls){
                 implCheckResult = impls[i].checkImplements(newClass.prototype);
@@ -215,6 +216,7 @@
     }
     
     this.merge = merge;
+    this.duplicate = duplicate;
     this.define = define;
     
     /* //test code
