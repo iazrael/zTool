@@ -1,4 +1,4 @@
-Z.$package('Z.util', function(z){
+;Z.$package('Z.util', function(z){
     
     
     
