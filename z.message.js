@@ -109,6 +109,22 @@
      * 向消息的监听者广播一条消息
      * @param {String} type ,消息类型
      * @param {Object} message, 消息体
+     * @example
+        var func1 = function(type, message){
+            console.log('help!!!!! don\t kill me ..... call 110.');
+            throw '110';
+        }
+        
+        z.message.on('kill', func1);
+        
+        z.message.on('kill', function(type, message){
+            console.log('ok, i m dead.');
+            
+        });
+        
+        //notify it
+        z.message.notify('kill')
+     
      */
     var notify = function(type, message){
         var element;

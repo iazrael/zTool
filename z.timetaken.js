@@ -1,5 +1,5 @@
 
-;Z.$package('Z', function(z){
+;Z.$package('Z.util', function(z){
     
     var timeTaken = function(func){
         var name = '>>>', beforeCb, afterCb;

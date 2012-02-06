@@ -10,7 +10,7 @@ var IGNORE_FILE_LIST = [
 ];
 var COMBINE_FILE_LIST = [
     'z.core.js',
-    'z.plus.js',
+    'z.base.js',
     'z.class.js',
     'z.array.js',
     'z.browser.js',
@@ -20,6 +20,7 @@ var COMBINE_FILE_LIST = [
     'z.message.js',
     'z.string.js',
     'z.timetaken.js',
+    'z.beater.js',
     'z.util.js'
 ];
 

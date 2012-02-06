@@ -12,7 +12,7 @@
     
     var emptyFunction = function(){};
     
-    var isDebuging = 0;
+    var isDebuging = 1;
     
     var debug = isDebuging ? (window.console ? function(data){
         console.debug ? console.debug(data) : console.log(data);
@@ -134,8 +134,32 @@
     };
     
     /**
+     * @param {String} packageName
      * @param {Object} requirePackages for 异步按需加载各种依赖模块
      * { shortName: packageName } or [packageName]
+     * @param {Function} constructor
+     * @example 
+     *  Z.$package('Z.test', function(z){
+        });
+        Z.$package('Z.test.test1', {
+            t: 'Z.test2',
+            u: 'Z.util',
+            o: 'Z.tools'
+        }, function(z, d){
+            console.log(d.t);
+        });
+        Z.$package('Z.test2', function(z){
+            console.log(11111111);
+        });
+        Z.$package('Z.test2', function(z){
+            console.log(22222222);
+        });
+        Z.$package('Z.util', {
+            t: 'Z.tools'
+        }, function(z){
+        });
+        Z.$package('Z.tools',function(z){
+        });
      */
     var $package = function(){
         var packageName, requirePackages,  constructor;
