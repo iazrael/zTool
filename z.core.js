@@ -134,7 +134,7 @@
     };
     
     /**
-     * @param {Object} requirePackages
+     * @param {Object} requirePackages for 异步按需加载各种依赖模块
      * { shortName: packageName } or [packageName]
      */
     var $package = function(){

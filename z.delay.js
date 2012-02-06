@@ -1,5 +1,5 @@
 /**
- * setTimout 的封装, 用于输入检测等触发过快的事件/方法处理
+ * setTimout 的封装, 用于处理输入检测等触发过快的事件/方法
  */
 ;Z.$package('Z.util', function(z){
     
