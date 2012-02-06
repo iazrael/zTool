@@ -59,6 +59,7 @@
 	 * @param {Object} option , 可指定 extend 和 implements, statics
      * {extend: {Class}, //继承的父类
      * implements: [{Interface}],//所实现的接口
+     * name: {String}, //类名
      * statics: {{String}: {Function}||{Object}},//定义的静态变量和方法
      * }
      * 
@@ -165,7 +166,9 @@
     /**
 	 * 定义类或接口
      * @example
-     * var A = define('class', {
+     *  var A = define('class', {
+            name: 'classA'
+        }, {
             init: function(){
                 console.log('A init');
             },
