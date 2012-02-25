@@ -6,6 +6,10 @@
     
     var toString = Object.prototype.toString;
     
+    this.isString = function(obj){
+        return toString.call(obj) === '[object String]';
+    }
+    
     this.isArray = function(obj){
         return toString.call(obj) === '[object Array]';
     }

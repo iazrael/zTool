@@ -72,6 +72,8 @@
         }
         if(typeof(prototype.init) !== 'function'){
             throw new Error('a class must have a "init" method');
+//            TODO 没有的 init 方法的时候指定一个空的?
+//            prototype.init = function(){};
         }
         var newClass = function(){
             return this.init.apply(this, arguments);
@@ -82,21 +84,22 @@
                 throw new Error('can not extend a interface!');
             }
             var superInit = superClass.prototype.init;
+            var thisInit = prototype.init;//释放传入 prototype 变量的引用, 以便内存回收
             var superPrototype = duplicate(superClass.prototype);
             delete superPrototype.init;
-            newClass.prototype = merge({}, superClass.prototype, prototype);
+            var newPrototype = newClass.prototype = merge({}, superClass.prototype, prototype);
             newClass.prototype.init = function(){
+                this.$static = newClass;
                 var argus = duplicate(arguments);
                 superInit.apply(this, argus);
                 argus = duplicate(arguments);
-                prototype.init.apply(this, argus);
-                //把父类被重写的方法赋给子类实例, 未重写的不处理
+                thisInit.apply(this, argus);
+                //把父类被重写的方法赋给子类实例
                 var that = this;
-                this.superClass = {};//TODO 这里有问题, 不能向上找父类的父类
-                //TODO 或者提供直接使用 superPrototype 的配置?
+                this.$super = {};//TODO 这里有问题, 不能向上找父类的父类
                 for(var prop in superPrototype){
-                    if(z.isFunction(superPrototype[prop]) && prototype[prop]){
-                        this.superClass[prop] = (function(prop){
+                    if(z.isFunction(superPrototype[prop]) && newPrototype[prop]){//子类重写了的方法, 才覆盖
+                        this.$super[prop] = (function(prop){
                             return function(){
                                 superPrototype[prop].apply(that, arguments);
                             }
@@ -105,12 +108,18 @@
                 }
             }
         }else{
+            var thisInit = prototype.init;
             newClass.prototype = prototype;
+            newClass.prototype.init = function(){
+                this.$static = newClass;
+                var argus = arguments;
+                thisInit.apply(this, argus);
+            }
         }
         newClass.type = 'class';
         newClass.className = option.name || 'anonymous';
         var impls = option['implements'];
-        if(impls){//TODO implements 的检查是否可以放到实例化的时候?
+        if(impls){
             var unImplMethods = [], implCheckResult;
             for(var i in impls){
                 implCheckResult = impls[i].checkImplements(newClass.prototype);
@@ -120,7 +129,7 @@
                 throw new Error('the \'' + newClass.className + '\' class hasn\'t implemented the interfaces\'s methods . [' + unImplMethods + ']');
             }
         }
-        if(option.statics){
+        if(option.statics){//TODO 提供更快速的访问 类方法的途径, 比如: this.$static ?
             merge(newClass, option.statics);
         }
         return newClass;
@@ -221,6 +230,9 @@
     this.merge = merge;
     this.duplicate = duplicate;
     this.define = define;
+    
+    this.$class = defineClass;
+    this.$interface = defineInterface;
     
     /* //test code
     var A = define('class', {
