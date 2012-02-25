@@ -1,4 +1,3 @@
-
 /**
  * 一些最基本的方法, 提供简单的访问方式
  */
@@ -11,7 +10,7 @@
     }
     
     this.isArray = function(obj){
-        return toString.call(obj) === '[object Array]';
+        return Array.isArray ? Array.isArray(obj) : toString.call(obj) === '[object Array]';
     }
     
     this.isArguments = function(obj){
