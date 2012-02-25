@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Build" default="clean" basedir="./">
+	
+	<description>Build</description>
+	
+	<property name="charset" value="utf-8"/>
+    
+    <target name="init">
+    </target>
+    
+    <target name="concat" depends="init">
+        <concat destfile="${basedir}/../ztool.all.js" encoding="${charset}" outputencoding="${charset}">
+            <path path="NOTE" />
+            <path path="z.core.js" />
+            <path path="z.base.js" />
+            <path path="z.class.js" />
+            <path path="z.array.js" />
+            <path path="z.util.delay.js" />
+            <path path="z.dom.js" />
+            <path path="z.message.js" />
+            <path path="z.string.js" />
+            <path path="z.util.beater.js" />
+            <path path="z.util.js" />
+        </concat>
+    </target>
+    
+    <target name="clean" depends="concat">
+        <!-- <delete dir="${temp}" /> -->
+	</target>
+</project>

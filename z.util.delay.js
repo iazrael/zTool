@@ -1,6 +1,5 @@
 /**
- * setTimout 的封装, 延时执行一个方法, 并提供取消接口
- * 用于输入检测等触发过快的事件/方法处理
+ * setTimout 的封装, 用于处理输入检测等触发过快的事件/方法
  */
 ;Z.$package('Z.util', function(z){
     
@@ -21,7 +20,7 @@
      * 2. delay(1000, func)
      * 3. delay(func) === delay(0, func)
      */
-    var delay = function(id, time, func, onClearFunc/*TODO 未实现*/){
+    this.delay = function(id, time, func, onClearFunc/*TODO 未实现*/){
         var argu = arguments;
         var flag = DELAY_STATUS.NORMAL;
         if(argu.length === 1){
@@ -40,7 +39,7 @@
                 flag = DELAY_STATUS.ID_EXIST;
             }
             var wrapFunc = function(){
-                func.apply(window);
+                func.apply(window, [id]);
                 timerList[id] = 0;
                 delete timerList[id];
             };
@@ -52,7 +51,7 @@
         return flag;
     }
     
-    var clearDelay = function(id){
+    this.clearDelay = function(id){
         if(id in timerList){
             window.clearTimeout(timerList[id]);
             timerList[id] = 0;
@@ -62,6 +61,43 @@
         return DELAY_STATUS.ID_NOT_EXIST;
     }
     
-    this.delay = delay;
-    this.clearDelay = clearDelay;
+    var intervalerList = {};
+    
+    /**
+     * 定时循环执行传入的func
+     */
+    this.loop = function(id, time, func){
+        var argu = arguments;
+        var flag = DELAY_STATUS.NORMAL;
+        if(argu.length == 2){
+            func = time;
+            time = id;
+        }
+        time = time || 0;
+        if(id && time){
+            if(id in intervalerList){
+                window.clearInterval(intervalerList[id]);
+                flag = DELAY_STATUS.ID_EXIST;
+            }
+            var wrapFunc = function(){
+                func.apply(window, [id]);
+            };
+            var intervaler = window.setInterval(wrapFunc, time);
+            intervalerList[id] = intervaler;
+        }else{
+            setInterval(func, time);
+        }
+        return flag;
+    }
+    
+    this.clearLoop = function(id){
+        if(id in intervalerList){
+            window.clearInterval(intervalerList[id]);
+            intervalerList[id] = 0;
+            delete intervalerList[id];
+            return DELAY_STATUS.NORMAL;
+        }
+        return DELAY_STATUS.ID_NOT_EXIST;
+    }
+    
 });
