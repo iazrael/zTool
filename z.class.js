@@ -1,6 +1,8 @@
 
 ;Z.$package('Z', function(z){
     
+    var emptyFunction = function(){};
+
     /**
 	 * 合并几个对象并返回 baseObj,
      * 如果 extendObj 有数组属性, 则直接拷贝引用
@@ -71,9 +73,9 @@
             option = {};
         }
         if(typeof(prototype.init) !== 'function'){
-            throw new Error('a class must have a "init" method');
-//            TODO 没有的 init 方法的时候指定一个空的?
-//            prototype.init = function(){};
+            // throw new Error('a class must have a "init" method');
+           // 没有的 init 方法的时候指定一个空的
+           prototype.init = emptyFunction;
         }
         var newClass = function(){
             return this.init.apply(this, arguments);
