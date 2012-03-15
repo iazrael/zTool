@@ -5,7 +5,7 @@ Z.$package('Z.string', function(z){
      * @param {Object} obj 要转换成查询字符串的对象
      * @return {String} 返回转换后的查询字符串
      */
-    toQueryPair = function(key, value) {
+    var toQueryPair = function(key, value) {
         return encodeURIComponent(String(key)) + "=" + encodeURIComponent(String(value));
     };
     
@@ -14,7 +14,7 @@ Z.$package('Z.string', function(z){
      * @param {Object} obj 要转换成查询字符串的对象
      * @return {String} 返回转换后的查询字符串
      */
-    toQueryString = function(obj){
+    this.toQueryString = function(obj){
         var result=[];
         for(var key in obj){
             result.push(toQueryPair(key, obj[key]));
@@ -48,7 +48,7 @@ Z.$package('Z.string', function(z){
      *  });
      * };
      */
-    template = function(str, data){
+    this.template = function(str, data){
         // Figure out if we're getting a template, or if we need to
         // load the template - and be sure to cache the result.
         var fn = !/\W/.test(str) ?
@@ -78,6 +78,4 @@ Z.$package('Z.string', function(z){
         return data ? fn( data ) : fn;
     };
     
-    this.toQueryString = toQueryString;
-    this.template = template;
 });

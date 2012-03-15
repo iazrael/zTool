@@ -45,7 +45,7 @@
      * @param {String} value 检测是否支持指定值 @optional
      * @param {Boolean} checkPrivate 指定是否尝试检测浏览器的私有支持 @default false @optional
      */
-    var cssSupport = function(property, value, checkPrivate){
+    this.cssSupport = function(property, value, checkPrivate){
         throw new Error('not support');
         var element = getCheckerElement();
         if(property in element.style){//TODO 不够完善
@@ -60,6 +60,5 @@
         }
     }
     
-    this.cssSupport = cssSupport;
     
 });

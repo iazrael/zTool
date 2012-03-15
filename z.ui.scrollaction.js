@@ -24,6 +24,10 @@
                 //保证这个延迟的时间比动画长, 不能在下一个动画还没执行, 这里已经触发了
                 var delayTime = context._scrollEventDelay + context._animationDuration;
                 z.util.delay(context._id + '_scroll', delayTime, function(){
+                    if(context._noScollEvent){
+                        context._noScollEvent = false;
+                        return;
+                    }
                     if(context._el.scrollTop === 0 && context._onScrollToTop){
                         context._onScrollToTop();
                     }else if(context._el.scrollTop === (context._el.scrollHeight - context._el.clientHeight) 
@@ -55,7 +59,8 @@
         /**
          * 滚动到指定位置
          * @param {Number},{String} scrollTop 指定scrollTop, 或者关键字 'top'/'bottom'
-         * @param {Boolean} hasAnimation 只是是否执行滚动动画
+         * @param {Boolean} hasAnimation 指示是否执行滚动动画
+         * @param {Boolean} noScollEvent 指示改行为是否不要出发 scrollEvent
          * @example
          * 1.scrollAction.scrollTo(0);
          * 2.scrollAction.scrollTo(200);
@@ -63,7 +68,7 @@
          * 4.scrollAction.scrollTo('bottom');
          * 
          */
-        scrollTo: function(scrollTop, hasAnimation){
+        scrollTo: function(scrollTop, hasAnimation, noScollEvent){
             var context = this;
             z.util.clearLoop(this._id);
             var maxScrollHeight = this._el.scrollHeight - this._el.clientHeight;
@@ -84,6 +89,7 @@
             if(scrollTop === this._el.scrollTop){
                 return false;
             }
+            this._noScollEvent = noScollEvent;
             if(!hasAnimation){
                 this._el.scrollTop = scrollTop;
             }else{

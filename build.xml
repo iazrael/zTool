@@ -10,7 +10,6 @@
     
     <target name="concat" depends="init">
         <concat destfile="${basedir}/../ztool.all.js" encoding="${charset}" outputencoding="${charset}">
-            <path path="NOTE" />
             <path path="z.core.js" />
             <path path="z.base.js" />
             <path path="z.class.js" />
