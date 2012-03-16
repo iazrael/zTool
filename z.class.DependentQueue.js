@@ -5,111 +5,103 @@
  * 不能用于节拍间距比较长(大于一分钟的那种)并且要求精度比较高的情况
  * 一秒内的情况比较好用
  */
-;Z.$package('Z.class', ['Z.message'], function(z){
+;Z.$package('Z.class', function(z){
     
-    this.Beater = z.$class({
-        name: 'Beater',
-        statics: {
-            DEFAULT_INTERVAL: 50,
-            DEFAULT_MAX_INTERVAL: 60 * 1000
-        }
-    }, {
+    /**
+     * @class
+     * 一系列方法的执行依赖队列, 每个方法执行完成之后必须手动调用 next() 方法
+     * 整个队列执行完成之后自动执行初始化时传入的 onFinish 方法
+     */
+    this.DependentQueue = new z.$class({
+            name: 'DependentQueue',
+            statics: {
+                STATUS_INIT: 1,
+                STATUS_RUNNING: 2,
+                STATUS_PAUSE: 3,
+                STATUS_STOP: 4
+            }
+        }, {
+        /**
+         * @param {Object} option
+         * {
+         *  onPause: 
+         *  onFinish:
+         *  onStop:
+         * }
+         */
         init: function(option){
             option = option || {};
-            this._triggers = {};
-            this._beaters = {};
-            this._isStart = false;
-            this._autoStart = ('autoStart' in option) ? option.autoStart : true;
-            this._interval = option.interval || this.$static.DEFAULT_INTERVAL;
-            //maxInterval 是为了防止timecount会一直无限增上去
-            this._maxInterval = option.maxInterval || this.$static.DEFAULT_MAX_INTERVAL;
-        },
-        checkBeater: function(){
-            var count = 0;
-            for(var i in this._beaters){
-                count += this._beaters[i];
-            }
-            return !!count;
-        },
-        add: function(bid, time, func){
-        	
-        	if(time % this._interval){
-        		//time 不能整除
-        		time = Math.round(time / this._interval) * this._interval;
-        	}else if(time < this._interval){//不能小于
-                time = this._interval;
-            }else if(time > this._maxInterval){
-                time = this._maxInterval;
-            }
+            this._onFinish = option.onFinish;
+            this._onPause = option.onPause;
+            this._onStop = option.onStop;
             
-            if(this._triggers[bid]){
-                throw new Error('beater is exist');
+            this._currentIndex = -1;
+            this._items = [];
+            
+            this._status = this.$static.STATUS_INIT;
+        },
+        /**
+         * @param {Object} item
+         * {
+         *  id: 'xxx'
+         *  exec: ...
+         *  
+         * }
+         * 
+         */
+        add: function(item){
+            if(this.isRunning()){
                 return false;
             }
-            var event = 'Beater-' + time;
-            this._beaters[time] = this._beaters[time] || 0;
-            this._triggers[bid] = {
-                time: time,
-                func: func
-            };
-            z.message.on(this, event, func);
-            this._beaters[time]++;
-            if(!this._isStart && this._autoStart){
-                this.start();
-            }
+            this._items.push(item);
             return true;
         },
-        remove: function(bid){
-            var trigger = this._triggers[bid];
-            if(!trigger){
-                return false;
-            }
-            var event = 'Beater-' + trigger.time;
-            this._beaters[trigger.time]--;
-            this._triggers[bid] = null;
-            delete this._triggers[bid];
-            z.message.off(this, event, trigger.func);
-            if(!this.checkBeater()){
-                this.stop();
-            }
-            return true;
+        isRunning: function(){
+            return this._status === this.$static.STATUS_RUNNING;
         },
-        start: function(){
-            if(this._isStart){
+        run: function(){
+            if(this.isRunning()){
                 return false;
             }
-            var context = this;
-            var timeCount = 0, interval = this._interval;
-            this._timer = setInterval(function(){
-                timeCount += interval;
-                if(timeCount >= context._maxInterval){
-                    timeCount = 0;
+            if(this._items.length <= 0){
+                return false;
+            }
+            if(this._currentIndex >= this._items.length - 1){
+                return false;
+            }
+            this._status = this.$static.STATUS_RUNNING;
+            this.next();
+        },
+        reRun: function(){
+            this._currentIndex--;
+            this.next();
+        },
+        next: function(){
+            this._currentIndex++;
+            var item = this._items[this._currentIndex];
+            if(item){
+                item.exec(this, item);
+            }else{
+                if(this._onFinish){
+                    this._onFinish(this);
                 }
-                var inter;
-                for(var i in context._beaters){
-                	if(!context._beaters[i]){
-                		//这下面没有挂 beater
-                		continue;
-                	}
-                	inter = Number(i);
-                	if(!(timeCount % inter)){
-                        z.message.notify(context, 'Beater-' + inter, {time: inter});
-                    }
-                }
-                
-            }, interval);
-            this._isStart = true;
-            return true;
+            }
+        },
+        pause: function(){
+            this._status = this.$static.STATUS_PAUSE;
+            if(this._onPause){
+                var item = this._items[this._currentIndex];
+                this._onPause(this, item);
+            }
         },
         stop: function(){
-            if(!this._isStart){
-                return false;
+            this._status = this.$static.STATUS_STOP;
+            if(this._onStop){
+                var item = this._items[this._currentIndex];
+                this._onStop(this, item);
             }
-            clearInterval(this._timer);
-            this._timer = 0;
-            this._isStart = false;
-            return true;
         }
     });
+
     
 });

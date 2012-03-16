@@ -91,7 +91,7 @@
             delete superPrototype.init;
             var newPrototype = newClass.prototype = merge({}, superClass.prototype, prototype);
             newClass.prototype.init = function(){
-                this.$static = newClass;
+                this.$static = newClass;//提供更快速的访问 类方法的途径
                 var argus = duplicate(arguments);
                 superInit.apply(this, argus);
                 argus = duplicate(arguments);
@@ -113,7 +113,7 @@
             var thisInit = prototype.init;
             newClass.prototype = prototype;
             newClass.prototype.init = function(){
-                this.$static = newClass;
+                this.$static = newClass;//提供更快速的访问 类方法的途径
                 var argus = arguments;
                 thisInit.apply(this, argus);
             }
@@ -131,7 +131,7 @@
                 throw new Error('the \'' + newClass.className + '\' class hasn\'t implemented the interfaces\'s methods . [' + unImplMethods + ']');
             }
         }
-        if(option.statics){//TODO 提供更快速的访问 类方法的途径, 比如: this.$static ?
+        if(option.statics){
             merge(newClass, option.statics);
         }
         return newClass;
