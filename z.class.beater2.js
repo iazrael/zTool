@@ -7,18 +7,11 @@
  */
 ;Z.$package('Z.class', ['Z.message'], function(z){
     
-    var Beater = this.Beater = z.define('class', {
+    this.Beater = z.$class({
         name: 'Beater',
         statics: {
             DEFAULT_INTERVAL: 50,
-            DEFAULT_INTERVALS: [50, 100, 200, 500, 1000, 5000, 10 * 1000, 30 * 1000, 60 * 1000],
-            DEFAULT_MAX_INTERVAL: 60 * 1000,
-            createUid: function(){
-                if(!this._beaterIncreseId){
-                    this._beaterIncreseId = 0;
-                }
-                return this._beaterIncreseId++;
-            }
+            DEFAULT_MAX_INTERVAL: 60 * 1000
         }
     }, {
         init: function(option){
@@ -26,23 +19,10 @@
             this._triggers = {};
             this._beaters = {};
             this._isStart = false;
-            this._interval = option.interval || Beater.DEFAULT_INTERVAL;
-            this._intervals = option.intervals || Beater.DEFAULT_INTERVALS;
-            this._maxInterval = option.maxInterval || Beater.DEFAULT_MAX_INTERVAL;
-            this._beaterId = Beater.createUid();
-        },
-        checkTime: function(time){
-            time = Number(time);
-            if(!time){
-                return false;
-            }
-            if(this._intervals.indexOf(time) === -1){
-                return false;
-            }
-            if(time > this._maxInterval){
-                return false;
-            }
-            return true;
+            this._autoStart = ('autoStart' in option) ? option.autoStart : true;
+            this._interval = option.interval || this.$static.DEFAULT_INTERVAL;
+            //maxInterval 是为了防止timecount会一直无限增上去
+            this._maxInterval = option.maxInterval || this.$static.DEFAULT_MAX_INTERVAL;
         },
         checkBeater: function(){
             var count = 0;
@@ -52,18 +32,29 @@
             return !!count;
         },
         add: function(bid, time, func){
-            if(this._triggers[bid] || !this.checkTime(time)){
+        	
+        	if(time % this._interval){
+        		//time 不能整除
+        		time = Math.round(time / this._interval) * this._interval;
+        	}else if(time < this._interval){//不能小于
+                time = this._interval;
+            }else if(time > this._maxInterval){
+                time = this._maxInterval;
+            }
+            
+            if(this._triggers[bid]){
+                throw new Error('beater is exist');
                 return false;
             }
-            var event = 'Beater-' + this._beaterId + '-' + time;
+            var event = 'Beater-' + time;
             this._beaters[time] = this._beaters[time] || 0;
             this._triggers[bid] = {
                 time: time,
                 func: func
             };
-            z.message.on(event, func);
+            z.message.on(this, event, func);
             this._beaters[time]++;
-            if(!this._isStart){
+            if(!this._isStart && this._autoStart){
                 this.start();
             }
             return true;
@@ -73,11 +64,11 @@
             if(!trigger){
                 return false;
             }
-            var event = 'Beater-' + this._beaterId + '-' + trigger.time;
+            var event = 'Beater-' + trigger.time;
             this._beaters[trigger.time]--;
             this._triggers[bid] = null;
             delete this._triggers[bid];
-            z.message.off(event, trigger.func);
+            z.message.off(this, event, trigger.func);
             if(!this.checkBeater()){
                 this.stop();
             }
@@ -94,11 +85,18 @@
                 if(timeCount >= context._maxInterval){
                     timeCount = 0;
                 }
-                for(var i = 0, inter; inter = context._intervals[i]; i++){
-                    if(!(timeCount % inter) && context._beaters[inter]){
-                        z.message.notify('Beater-' + context._beaterId + '-' + inter, {time: inter});
+                var inter;
+                for(var i in context._beaters){
+                	if(!context._beaters[i]){
+                		//这下面没有挂 beater
+                		continue;
+                	}
+                	inter = Number(i);
+                	if(!(timeCount % inter)){
+                        z.message.notify(context, 'Beater-' + inter, {time: inter});
                     }
                 }
+                
             }, interval);
             this._isStart = true;
             return true;
