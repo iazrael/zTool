@@ -1,12 +1,9 @@
-/**
- * 节拍器, 节省设置多个setIntervel带来的性能消耗
- * 最长节拍是一分钟
- * 节拍的起点未必完全正确, 节拍越长, 起点的误差会越大
- * 不能用于节拍间距比较长(大于一分钟的那种)并且要求精度比较高的情况
- * 一秒内的情况比较好用
- */
+
 ;Z.$package('Z.class', ['Z.message'], function(z){
     
+    /**
+     * 通用 collection 类
+     */
     this.Collection = new z.$class({
         name: 'Collection'
     }, {
