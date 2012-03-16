@@ -1,5 +1,7 @@
 Z.$package('Z.dom', function(z){
     
+    var packageContext = this;
+
     /**
      * shot of getElementById
      */
@@ -82,6 +84,43 @@ Z.$package('Z.dom', function(z){
         }
     }
     
-    
+    /**
+     * @example
+     * bindCommends(cmds);
+     * bindCommends(el, cmds);
+     * bindCommends(el, 'click', cmds);
+     * 
+     * function(param, target, event){
+     * }
+     */
+    this.bindCommends = function(targetElement, eventName, commends){
+        var defaultEvent = 'click';
+        if(arguments.length === 1){
+            commends = targetElement;
+            targetElement = document.body;
+            eventName = defaultEvent;
+        }else if(arguments.length === 2){
+            commends = eventName;
+            eventName = defaultEvent;
+        }
+        if(targetElement.__commends){//已经有commends 就合并
+            z.merge(targetElement.__commends, commends);
+            return;
+        }
+        targetElement.__commends = commends;
+        targetElement.addEventListener(eventName, function(e){
+            var target = packageContext.getActionTarget(e, 3, 'cmd', this);
+            if(target){
+                var cmd = target.getAttribute('cmd');
+                var param = target.getAttribute('param');
+                if(target.href && target.getAttribute('href').indexOf('#') === 0){
+                    e.preventDefault();
+                }
+                if(this.__commends[cmd]){
+                    this.__commends[cmd](param, target, e);
+                }
+            }
+        });
+    }
     
 });
