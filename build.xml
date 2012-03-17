@@ -13,13 +13,7 @@
             <path path="z.core.js" />
             <path path="z.base.js" />
             <path path="z.class.js" />
-            <path path="z.array.js" />
-            <path path="z.util.delay.js" />
-            <path path="z.dom.js" />
             <path path="z.message.js" />
-            <path path="z.string.js" />
-            <path path="z.util.beater.js" />
-            <path path="z.util.js" />
         </concat>
     </target>
     

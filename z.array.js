@@ -1,4 +1,5 @@
-Z.$package('Z.array', function(z){
+
+;Z.$package('Z.array', function(z){
     
     this.remove = function(arr, item){
         var flag = false;

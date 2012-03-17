@@ -1,7 +1,7 @@
 
 ;Z.$package('Z.dom', function(z){
 
-    
+    var ELLIPSIS_TEMP_STYLE = 'position: absolute;left: -99999em;width: auto !important;';
     /**
      * 文本溢出处理, 默认替换为 "…"
      * @param {HTMLElement} element
@@ -12,7 +12,7 @@
         ellipsisText = ellipsisText || '…';
         var temp = element.cloneNode(true);
         temp.id = 'checkTextLengthNode';
-        temp.className = 'check-text-length-node';
+        temp.style.cssText = ELLIPSIS_TEMP_STYLE;
         element.parentNode.appendChild(temp);
         var realWidth = temp.clientWidth;
         if(realWidth <= limitWidth){

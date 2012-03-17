@@ -1,4 +1,5 @@
-Z.$package('Z.string', function(z){
+
+;Z.$package('Z.string', function(z){
     
     /**
      * 
