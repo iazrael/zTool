@@ -1,5 +1,5 @@
 
-;Z.$package('Z.class', function(z){
+;Z.$package('Z.util', function(z){
     
     /**
      * @class

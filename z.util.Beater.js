@@ -5,7 +5,7 @@
  * 不能用于节拍间距比较长(大于一分钟的那种)并且要求精度比较高的情况
  * 一秒内的情况比较好用
  */
-;Z.$package('Z.class', ['Z.message'], function(z){
+;Z.$package('Z.util', ['Z.message'], function(z){
     
     this.Beater = z.$class({
         name: 'Beater',
