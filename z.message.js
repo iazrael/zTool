@@ -32,7 +32,9 @@
         var wrapFunc;
         var element;
         var liteners;
-        if (arguments.length === 2) {
+        if(arguments.length < 2){
+            throw new Error('addListener arguments not enough')
+        }else if (arguments.length === 2) {
             func = type;
             type = model;
             model = window;
@@ -79,7 +81,7 @@
      * 移除事件监听
      * @param {Object} model 消息的挂载目标, 可选, 默认为 window
      * @param {String} type
-     * @param {Function} func 监听函数, 如果不指定, 则移除所有这个类型的监听函数
+     * @param {Function} func 监听函数
      */
     var removeListener = function(model, type, func) {
         var listener;
@@ -95,19 +97,20 @@
             return false;
         }
         element = getEventElement();
-        if (!func) {
-            for (var i in listeners[type]) {
-                listener = listeners[type][i];
-                if (element.removeEventListener) {
-                    element.removeEventListener(type, listener.wrapFunc, false);
-                } else {
-                    element.detachEvent(IE_CUSTOM_EVENT, listener.wrapFunc);
-                }
-            }
-            listeners[type] = null;
-            delete listeners[type];
-            return true;
-        }
+        // TODO 这个支持有存在的必要吗
+        // if (!func) {
+        //     for (var i in listeners[type]) {
+        //         listener = listeners[type][i];
+        //         if (element.removeEventListener) {
+        //             element.removeEventListener(type, listener.wrapFunc, false);
+        //         } else {
+        //             element.detachEvent(IE_CUSTOM_EVENT, listener.wrapFunc);
+        //         }
+        //     }
+        //     listeners[type] = null;
+        //     delete listeners[type];
+        //     return true;
+        // }
         for (var i in listeners[type]) {
             listener = listeners[type][i];
             if (listener.func === func) {
@@ -149,12 +152,15 @@
         var element;
         var event;
         var listeners;
-        z.debug('notify message: ' + type);
-        if (arguments.length === 2) {
+        if (arguments.length === 1) {
+            type = model;
+            model = window;
+        }else if (arguments.length === 2) {
             message = type;
             type = model;
             model = window;
         }
+        z.debug('notify message: ' + type);
         listeners = model.__liteners;
         if (!listeners || !listeners[type]) {
             return false;
