@@ -79,4 +79,21 @@
         return data ? fn( data ) : fn;
     };
     
+    /**
+     * 字符串格式函数
+     * 
+     * @Example 
+     * var a = "I Love {0}, and You Love {1},Where are {0}! {4}";
+     * alert(z.string.format(a, "You","Me")); 
+     */
+    this.format = function(str, arg1, arg2/*...*/) {
+        if( arguments.length == 0 )
+            return null;
+        var str = arguments[0];
+        for(var i=1;i<arguments.length;i++) {
+            var re = new RegExp('\\{' + (i-1) + '\\}','gm');
+            str = str.replace(re, arguments[i]);
+        }
+        return str;
+    }
 });
