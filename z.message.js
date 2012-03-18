@@ -33,7 +33,7 @@
         var element;
         var liteners;
         if(arguments.length < 2){
-            throw new Error('addListener arguments not enough')
+            throw new Error('addListener arguments not enough');
         }else if (arguments.length === 2) {
             func = type;
             type = model;
@@ -87,7 +87,9 @@
         var listener;
         var element;
         var listeners;
-        if (arguments.length === 2) {
+        if(arguments.length < 2){
+            throw new Error('removeListener arguments not enough');
+        }else if (arguments.length === 2) {
             func = type;
             type = model;
             model = window;

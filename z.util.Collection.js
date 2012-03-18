@@ -75,7 +75,7 @@
             }else{
                 this._arr.splice(index, 0, item);
             }
-            if(!noEvent)
+            if(!noEvent){
                 z.message.notify(this, 'add', {
                     item: item,
                     index: index
