@@ -38,7 +38,7 @@
          * @param {Object} item
          * {
          *  id: 'xxx'
-         *  exec: ...
+         *  exec: function(queue, item){}
          *  
          * }
          * 

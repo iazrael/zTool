@@ -184,6 +184,9 @@
         },
         getLast: function() {
             return this.get(this.length() - 1);
+        },
+        getAll: function(){
+            return this.getRange(0, this.length());
         }
     });
     
