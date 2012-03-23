@@ -72,7 +72,8 @@
             prototype = option;
             option = {};
         }
-        if(typeof(prototype.init) !== 'function'){
+        prototype = prototype || {};
+        if(!z.isFunction(prototype.init)){
             // throw new Error('a class must have a "init" method');
            // 没有的 init 方法的时候指定一个空的
            prototype.init = emptyFunction;
@@ -147,6 +148,20 @@
         return false;
     }
     
+    /**
+     * @ignore
+     */
+    var _checkImplements = function(instance){
+        var unImplMethods = [], impl;
+        for(var i in this.methods){
+            impl = instance[this.methods[i]];
+            if(!impl || !z.isFunction(impl)){
+                unImplMethods.push(methods[i]);
+            }
+        }
+        return unImplMethods;
+    }
+
 	/**
 	 * 定义接口
 	 **/
@@ -161,16 +176,7 @@
         newInterface.type = 'interface'
         newInterface.interfaceName = option.name || 'anonymous';
         newInterface.methods = methods;
-        newInterface.checkImplements = function(instance){
-            var unImplMethods = [], impl;
-            for(var i in methods){
-                impl = instance[methods[i]];
-                if(!impl || typeof(impl) !== 'function'){
-                    unImplMethods.push(methods[i]);
-                }
-            }
-            return unImplMethods;
-        }
+        newInterface.checkImplements = _checkImplements;
         return newInterface;
     }
     
