@@ -9,6 +9,8 @@
 
     var eventElement;
 
+    var increaseId = 0;
+
     var getEventElement = function() {
         if (!eventElement) {
             eventElement = document.createElement('div');
@@ -18,6 +20,10 @@
             }
         }
         return eventElement;
+    }
+
+    var getListenerId = function(){
+        return +new Date + '' + increaseId++ ;
     }
 
     /**
@@ -31,7 +37,8 @@
         var listener;
         var wrapFunc;
         var element;
-        var liteners;
+        var listeners;
+        var listenerId;
         if(arguments.length < 2){
             throw new Error('addListener arguments not enough');
         }else if (arguments.length === 2) {
@@ -39,15 +46,17 @@
             type = model;
             model = window;
         }
-        if (!model.__liteners) {
-            model.__liteners = {};
+        if (!model.__listeners) {
+            model.__listeners = {};
+            model.__listenerId = getListenerId();
         }
-        liteners = model.__liteners;
-        if (!liteners[type]) {
-            liteners[type] = [];
+        listeners = model.__listeners;
+        listenerId = model.__listenerId;
+        if (!listeners[type]) {
+            listeners[type] = [];
         } else {
-            for (var i in liteners[type]) {
-                listener = liteners[type][i];
+            for (var i in listeners[type]) {
+                listener = listeners[type][i];
                 if (listener.func === func) {
                     return false;
                 }
@@ -58,13 +67,14 @@
             wrapFunc = function(e) {
                 func.apply(window, e.params);
             }
-            element.addEventListener(type, wrapFunc, false);
+            element.addEventListener(listenerId + '-' + type, wrapFunc, false);
         } else {
             wrapFunc = function(e) {
                 e = window.event;
                 //TODO ie8及以下的浏览器后绑定的方法先执行, 导致触发的事件执行顺序倒过来了
                 //没精力去自己实现顺序执行, 先这样吧
-                if (type === e.params[1]) {
+                var lid = e.params.pop();
+                if (type === e.params[1] && lid === listenerId) {
                     func.apply(window, e.params);
                 }
             }
@@ -74,7 +84,7 @@
             func: func,
             wrapFunc: wrapFunc
         };
-        liteners[type].push(listener);
+        listeners[type].push(listener);
         return true;
     }
     /**
@@ -87,6 +97,7 @@
         var listener;
         var element;
         var listeners;
+        var listenerId;
         if(arguments.length < 2){
             throw new Error('removeListener arguments not enough');
         }else if (arguments.length === 2) {
@@ -94,7 +105,8 @@
             type = model;
             model = window;
         }
-        listeners = model.__liteners;
+        listeners = model.__listeners;
+        listenerId = model.__listenerId;
         if (!listeners || !listeners[type]) {
             return false;
         }
@@ -118,7 +130,7 @@
             if (listener.func === func) {
                 listeners[type].slice(i, 1);
                 if (element.removeEventListener) {
-                    element.removeEventListener(type, listener.wrapFunc, false);
+                    element.removeEventListener(listenerId + '-' + type, listener.wrapFunc, false);
                 } else {
                     element.detachEvent(IE_CUSTOM_EVENT, listener.wrapFunc);
                 }
@@ -154,6 +166,7 @@
         var element;
         var event;
         var listeners;
+        var listenerId;
         if (arguments.length === 1) {
             type = model;
             model = window;
@@ -163,7 +176,8 @@
             model = window;
         }
         z.debug('notify message: ' + type);
-        listeners = model.__liteners;
+        listeners = model.__listeners;
+        listenerId = model.__listenerId;
         if (!listeners || !listeners[type]) {
             return false;
         }
@@ -171,12 +185,12 @@
         element = getEventElement();
         if (document.createEvent) {
             event = document.createEvent('Events');
-            event.initEvent(type, false, false);
+            event.initEvent(listenerId + '-' + type, false, false);
             event.params = [message, type];
             element.dispatchEvent(event);
         } else {
             event = document.createEventObject(IE_CUSTOM_EVENT);
-            event.params = [message, type];
+            event.params = [message, type, listenerId];
             element.fireEvent(IE_CUSTOM_EVENT, event);
         }
         return listeners[type].length !== 0;

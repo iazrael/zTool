@@ -132,6 +132,7 @@
             if(item){
                 var index = this.getIndexByKey(key);
                 this._arr.splice(index, 1);
+                delete this._map[key];
                 if(!noEvent){
                     z.message.notify(this, 'remove', {
                         items: [item],
@@ -147,7 +148,7 @@
             var item = this._arr[index];
             if(item){
                 this._arr.splice(index, 1);
-                this._map[item[this._keyName]] = null;
+                delete this._map[item[this._keyName]];
                 if(!noEvent){
                     z.message.notify(this, 'remove', {
                         items: [item],

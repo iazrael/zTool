@@ -13,7 +13,7 @@
     
     var emptyFunction = function(){};
     
-    var isDebuging = 0;
+    var isDebuging = 1;
     
     var debug = isDebuging ? (window.console ? function(data){
         console.debug ? console.debug(data) : console.log(data);
@@ -80,7 +80,7 @@
         debug('initPackage: ' + pack.packageName);
         if(constructor){
             constructor.call(pack, library, require);
-            debug('[[' + pack.packageName + ' inited]]');
+            debug('package [[' + pack.packageName + ' inited]]');
         }
         pack.packageStatus = PACKAGE_STATUS.INITED;
         runDependenceQueue(pack.packageName);

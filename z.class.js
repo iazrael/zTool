@@ -55,7 +55,14 @@
             throw new Error('the argument isn\'t an object or array');
         }
     }
-    
+
+    /**
+     * @ignore
+     */
+    var _classToString = function(){
+        return this.className;
+    }
+
     /**
 	 * 定义类
 	 * @param {Object} option , 可指定 extend 和 implements, statics
@@ -79,6 +86,7 @@
            prototype.init = emptyFunction;
         }
         var newClass = function(){
+            z.debug( 'class [' + newClass.className + '] init');
             return this.init.apply(this, arguments);
         };
         var superClass = option.extend;
@@ -90,11 +98,12 @@
             var thisInit = prototype.init;//释放传入 prototype 变量的引用, 以便内存回收
             var superPrototype = duplicate(superClass.prototype);
             delete superPrototype.init;
-            var newPrototype = newClass.prototype = merge({}, superClass.prototype, prototype);
+            newClass.prototype = merge({}, superClass.prototype, prototype);
+            var newPrototype = prototype;
             newClass.prototype.init = function(){
-                this.$static = newClass;//提供更快速的访问 类方法的途径
                 var argus = duplicate(arguments);
                 superInit.apply(this, argus);
+                this.$static = newClass;//提供更快速的访问类方法的途径
                 argus = duplicate(arguments);
                 thisInit.apply(this, argus);
                 //把父类被重写的方法赋给子类实例
@@ -114,13 +123,15 @@
             var thisInit = prototype.init;
             newClass.prototype = prototype;
             newClass.prototype.init = function(){
-                this.$static = newClass;//提供更快速的访问 类方法的途径
+                this.$static = newClass;//提供更快速的访问类方法的途径
                 var argus = arguments;
                 thisInit.apply(this, argus);
             }
         }
         newClass.type = 'class';
         newClass.className = option.name || 'anonymous';
+        newClass.toString = _classToString;
+
         var impls = option['implements'];
         if(impls){
             var unImplMethods = [], implCheckResult;
@@ -160,6 +171,13 @@
             }
         }
         return unImplMethods;
+    }
+
+    /**
+     * @ignore
+     */
+    var _interfaceToString = function(){
+        return this.interfaceName;
     }
 
 	/**
