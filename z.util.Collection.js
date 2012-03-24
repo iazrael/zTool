@@ -12,7 +12,7 @@
             this._keyName = option.keyName || 'id';
             this._arr = [];
             this._map = {};
-            this.modifyTime = 0;
+            this._modifyTime = 0;
 
             var self = this;
             function onModify = function(){
@@ -28,7 +28,10 @@
          * 通过对比 modifyTime 的值就能判断出这个 collection 是否被修改了
          */
         setModify: function(){
-            this.modifyTime = +new Date();
+            this._modifyTime = +new Date();
+        },
+        getModify: function(){
+            return this._modifyTime;
         },
         getByKey: function(key){
             return this._map[key];
