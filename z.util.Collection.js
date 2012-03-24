@@ -1,5 +1,5 @@
 
-;Z.$package('Z.util', ['Z.message'], function(z){
+;Z.$package('Z.util', ['Z.message', 'Z.array'], function(z){
     
     /**
      * 通用 collection 类
@@ -56,13 +56,7 @@
             return this._arr.slice(start, end);
         },
         filter: function(key, value){
-            var result = [];
-            for(var i in this._arr){
-                if(this._arr[i][key] == value){
-                    result.push(this._arr[i]);
-                }
-            }
-            return result;
+            return z.array.filter(this._arr, key, value);
         },
         add: function(item, index, noEvent){
             var existItem = this._map[item[this._keyName]];
