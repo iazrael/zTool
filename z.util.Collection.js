@@ -15,7 +15,7 @@
             this._modifyTime = 0;
 
             var self = this;
-            function onModify = function(){
+            function onModify(){
                 self.setModify();
             }
 
