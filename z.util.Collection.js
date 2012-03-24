@@ -12,6 +12,23 @@
             this._keyName = option.keyName || 'id';
             this._arr = [];
             this._map = {};
+            this.modifyTime = 0;
+
+            var self = this;
+            function onModify = function(){
+                self.setModify();
+            }
+
+            z.message.on(this, 'add', onModify);
+            z.message.on(this, 'remove', onModify);
+            z.message.on(this, 'clear', onModify);
+        },
+        /**
+         * 设置一个修改状态位, 每当 collection有了变更, 这个 modifyTime 就会变
+         * 通过对比 modifyTime 的值就能判断出这个 collection 是否被修改了
+         */
+        setModify: function(){
+            this.modifyTime = +new Date();
         },
         getByKey: function(key){
             return this._map[key];
@@ -64,14 +81,15 @@
                 return false;
             }
             this._map[item[this._keyName]] = item;
-            if(typeof(index) == 'undefined'){
+            if(z.isUndefined(index)){
                 this._arr.push(item);
             }else{
                 this._arr.splice(index, 0, item);
             }
+
             if(!noEvent){
                 z.message.notify(this, 'add', {
-                    item: item,
+                    items: [item],
                     index: index
                 });
             }
@@ -92,14 +110,14 @@
             if(!newItems.length){
                 return false;
             }
-            if(typeof(index) == 'undefined'){
+            if(z.isUndefined(index)){
                 this._arr = this._arr.concat(newItems);
             }else{
                 var param = [index, 0].concat(newItems);
                 Array.prototype.splice.apply(this._arr, param);
             }
             if(!noEvent){
-                z.message.notify(this, 'addRange', {
+                z.message.notify(this, 'add', {
                     items: newItems,
                     index: index
                 });
@@ -113,7 +131,7 @@
                 this._arr.splice(index, 1);
                 if(!noEvent){
                     z.message.notify(this, 'remove', {
-                        item: item,
+                        items: [item],
                         index: index,
                         key: key
                     });
@@ -129,7 +147,7 @@
                 this._map[item[this._keyName]] = null;
                 if(!noEvent){
                     z.message.notify(this, 'remove', {
-                        item: item,
+                        items: [item],
                         index: index,
                         key: item[this._keyName]
                     });
@@ -162,7 +180,7 @@
                 return false;
             }
             if(!noEvent){
-                z.message.notify(this, 'removeRange', {
+                z.message.notify(this, 'remove', {
                     items: removedItems
                 });
             }

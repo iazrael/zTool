@@ -4,7 +4,7 @@
     /**
      * 从给定数组移除指定元素, 只删除一个
      * @param  {Array} arr  
-     * @param  {Object},{String} key
+     * @param  {Object},{String} key or item
      * @param {Object} value @optional 指定值
      * @return {Boolean}      找到并移除返回 true
      */
