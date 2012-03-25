@@ -144,7 +144,7 @@
      * 向消息的监听者广播一条消息
      * @param {Object} model 消息的挂载目标, 可选, 默认为 window
      * @param {String} type ,消息类型
-     * @param {Object} message, 消息体
+     * @param {Object} message, 消息体, 可选
      * @example
      * var func1 = function(type, message){
             console.log('help!!!!! don\t kill me ..... call 110.');
@@ -160,6 +160,8 @@
         
         //notify it
         z.message.notify('kill')
+        //or 
+        z.message.notify(window, 'kill')
      *
      */
     var notify = function(model, type, message) {
@@ -170,7 +172,7 @@
         if (arguments.length === 1) {
             type = model;
             model = window;
-        }else if (arguments.length === 2) {
+        }else if (arguments.length === 2 && z.isString(model)) {
             message = type;
             type = model;
             model = window;

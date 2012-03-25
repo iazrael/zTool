@@ -85,6 +85,7 @@
             }
             this._map[item[this._keyName]] = item;
             if(z.isUndefined(index)){
+                index = this._arr.length;
                 this._arr.push(item);
             }else{
                 this._arr.splice(index, 0, item);
@@ -114,6 +115,7 @@
                 return false;
             }
             if(z.isUndefined(index)){
+                index = this._arr.length;
                 this._arr = this._arr.concat(newItems);
             }else{
                 var param = [index, 0].concat(newItems);
