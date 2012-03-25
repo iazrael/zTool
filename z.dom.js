@@ -60,17 +60,17 @@
     
     /**
      *  @param {HTMLElement},{String} targetId, target dom or dom id
-     *  @param {String} tmplId, template dom id
+     *  @param {String} tmplId template dom id
      *  @param {Object} data
-     *  @param {Boolean} isPlus, add or replace
+     *  @param {Number} position @optional the index to insert, -1 to plus to last
      */
-    this.render = function(target, tmplId, data, isPlus){
+    this.render = function(target, tmplId, data, position){
         var tabTmpl = this.getTemplate(tmplId);
         var html = z.string.template(tabTmpl, data);
         if(typeof target === 'string'){
             target = this.get(target);
         }
-        if(isPlus && target.childElementCount){
+        if(!z.isUndefined(position) && target.childElementCount){
             var tempNode = document.createElement('div');
             tempNode.innerHTML = html;
             var nodes = tempNode.children;
@@ -78,7 +78,11 @@
             while(nodes[0]){
                 fragment.appendChild(nodes[0]);
             }
-            target.appendChild(fragment);
+            if(position === -1 || position >= target.childElementCount - 1){
+                target.appendChild(fragment);
+            }else{
+                target.insertBefore(fragment, target.children[position]);
+            }
             delete tempNode;
         }else{
             target.innerHTML = html;

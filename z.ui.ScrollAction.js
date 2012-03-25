@@ -29,10 +29,9 @@
                         context._noScollEvent = false;
                         return;
                     }
-                    if(context._el.scrollTop === 0 && context._onScrollToTop){
+                    if(context.isTop() && context._onScrollToTop){
                         context._onScrollToTop();
-                    }else if(context._el.scrollTop === (context._el.scrollHeight - context._el.clientHeight) 
-                        && context._onScrollToBottom){
+                    }else if(context.isBottom() && context._onScrollToBottom){
                         context._onScrollToBottom();
                     }
                 });
@@ -43,6 +42,20 @@
          */
         getScrollTop: function(){
             return this._el.scrollTop;
+        },
+        /**
+         * 判断滚动条是否已经在顶部了
+         * @return {Boolean} 
+         */
+        isTop: function(){
+            return this._el.scrollTop === 0;
+        },
+        /**
+         * 判断是否滚动条已经到底部了
+         * @return {Boolean} 
+         */
+        isBottom: function(){
+            return this._el.scrollTop === this._el.scrollHeight - this._el.clientHeight;
         },
         /**
          * 设置动画的参数
