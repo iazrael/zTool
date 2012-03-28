@@ -6,7 +6,7 @@
     /**
      * 设置一个 cookie 
      * @param {String} name 
-     * @param {String} value  
+     * @param {String},{Object} value  
      * @param {String} domain 
      * @param {String} path   
      * @param {Number} hour  
@@ -17,6 +17,10 @@
             var expire = new Date();
             expire.setTime(today.getTime() + 3600000 * hour);
         }
+        if(!z.isString(value)){
+            value = JSON.stringify(value);
+        }
+        value = window.encodeURIComponent(value);
         window.document.cookie = name + '=' + value + '; ' 
             + (hour ? ('expires=' + expire.toGMTString() + '; ') : '') 
             + (path ? ('path=' + path + '; ') : 'path=/; ') 
@@ -31,7 +35,14 @@
     this.get = function(name) {
         var r = new RegExp('(?:^|;+|\\s+)' + name + '=([^;]*)');
         var m = window.document.cookie.match(r);
-        return (!m ? '' : m[1]);
+        var value = !m ? '' : m[1];
+        value = window.decodeURIComponent(value);
+        try{
+            value = JSON.parse(value);
+        }catch(e){
+
+        }
+        return value;
     }
     
     /**
