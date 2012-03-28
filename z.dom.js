@@ -65,6 +65,7 @@
      *  @param {Number} position @optional the index to insert, -1 to plus to last
      */
     this.render = function(target, tmplId, data, position){
+        data = data || {};
         var tabTmpl = this.getTemplate(tmplId);
         var html = z.string.template(tabTmpl, data);
         if(typeof target === 'string'){

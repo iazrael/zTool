@@ -15,7 +15,7 @@
         if (hour) {
             var today = +new Date;
             var expire = new Date();
-            expire.setTime(today.getTime() + 3600000 * hour);
+            expire.setTime(today + 3600000 * hour);
         }
         if(!z.isString(value)){
             value = JSON.stringify(value);
