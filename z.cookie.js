@@ -41,7 +41,7 @@
      * @param {String} domain
      * @param {String} path 
      */
-    this.remove : function(name, domain, path) {
+    this.remove = function(name, domain, path) {
         window.document.cookie = name + '=; expires=Mon, 26 Jul 1997 05:00:00 GMT; ' 
             + (path ? ('path=' + path + '; ') : 'path=/; ') 
             + (domain ? ('domain=' + domain + ';') : ('domain=' + defaultDomain + ';'));
