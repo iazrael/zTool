@@ -44,7 +44,6 @@
             
             if(this._triggers[bid]){
                 throw new Error('beater is exist');
-                return false;
             }
             var event = 'Beater-' + time;
             this._beaters[time] = this._beaters[time] || 0;
