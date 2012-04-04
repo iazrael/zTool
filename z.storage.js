@@ -1,55 +1,67 @@
 
 ;Z.$package('Z.storage', function(z){
 
-    
-    this.isSupport = function(){
-        return window.localStorage != null;
-    }
 
-    /**
-     * 设置内容到本地存储
-     * @param {String} key   要设置的 key
-     * @param {String}, {Object} value 要设置的值, 可以是字符串也可以是可序列化的对象
-     */
-    this.set = function(key, value){
-        if(this.isSupport()){
-            if(!z.isString(value)){
-                value = JSON.stringify(value);
+    var Storage = z.$class({
+        name: 'Storage'
+    }, {
+        init: function(storage){
+            this._storage = storage;
+        },
+
+        isSupport: function(){
+            return this._storage != null;
+        },
+
+        /**
+         * 设置内容到本地存储
+         * @param {String} key   要设置的 key
+         * @param {String}, {Object} value 要设置的值, 可以是字符串也可以是可序列化的对象
+         */
+        set: function(key, value){
+            if(this.isSupport()){
+                if(!z.isString(value)){
+                    value = JSON.stringify(value);
+                }
+                this._storage.setItem(key, value);
+                return true;
             }
-            window.localStorage.setItem(key, value);
-            return true;
-        }
-        return false;
-        
-    }
+            return false;
+            
+        },
 
-    this.get = function(key){
-        if(this.isSupport()){
-            var value = window.localStorage.getItem(key);
-            try{
-                value = JSON.parse(value);
-            }catch(e){
+        get: function(key){
+            if(this.isSupport()){
+                var value = this._storage.getItem(key);
+                try{
+                    value = JSON.parse(value);
+                }catch(e){
 
+                }
+                return value;
             }
-            return value;
-        }
-        return false;
-    }
+            return false;
+        },
 
-    this.remove = function(key){
-        if(this.isSupport()){
-            window.localStorage.removeItem(key);
-            return true;
-        }
-        return false;
-    }
+        remove: function(key){
+            if(this.isSupport()){
+                this._storage.removeItem(key);
+                return true;
+            }
+            return false;
+        },
 
-    this.clear = function(){
-        if(this.isSupport()){
-            window.localStorage.clear();
-            return true;
+        clear: function(){
+            if(this.isSupport()){
+                this._storage.clear();
+                return true;
+            }
+            return false;
         }
-        return false;
-    }
+    });
+
+    this.local = new Storage(window.localStorage);
+
+    this.session = new Storage(window.sessionStorage);
     
 });
