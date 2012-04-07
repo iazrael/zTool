@@ -9,8 +9,8 @@
         return toString.call(obj) === '[object String]';
     }
     
-    this.isArray = function(obj){
-        return Array.isArray ? Array.isArray(obj) : toString.call(obj) === '[object Array]';
+    this.isArray = Array.isArray || function(obj){
+        return toString.call(obj) === '[object Array]';
     }
     
     this.isArguments = function(obj){

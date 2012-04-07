@@ -1,5 +1,5 @@
 
-;Z.$package('Z.dom', function(z){
+;Z.$package('Z.dom', ['Z.string'], function(z){
     
     var packageContext = this;
 

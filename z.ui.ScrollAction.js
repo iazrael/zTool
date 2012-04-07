@@ -1,5 +1,5 @@
 
-;Z.$package('Z.ui', function(z){
+;Z.$package('Z.ui', ['.util.delay', 'Z.util.loop'], function(z){
 
     /**
      * 滚动条的通用逻辑封装
@@ -86,7 +86,7 @@
             var context = this;
             z.util.clearLoop(this._id);
             var maxScrollHeight = this._el.scrollHeight - this._el.clientHeight;
-            if(J.isString(scrollTop)){
+            if(z.isString(scrollTop)){
                 if(scrollTop === 'top'){
                     scrollTop = 0;
                 }

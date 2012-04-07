@@ -1,5 +1,5 @@
 
-;Z.$package('Z.browser', ['Z.class'], function(z){
+;Z.$package('Z.browser', function(z){
     var packageContext = this;
 	
     (function(){

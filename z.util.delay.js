@@ -14,13 +14,14 @@
      * @param {String} id @optional
      * @param {Number} time @optional
      * @param {Function} func
-     * @param {Function} onClearFunc @optional
+     * @param {Object} funcContext @optional func的执行上下文, 默认 window
      * @example
      * 1. delay('id01', 1000, func)
      * 2. delay(1000, func)
      * 3. delay(func) === delay(0, func)
+     * 4. delay('id02', 1000, func, context)
      */
-    this.delay = function(id, time, func, onClearFunc/*TODO 未实现*/){
+    this.delay = function(id, time, func, funcContext){
         var argu = arguments;
         var flag = DELAY_STATUS.NORMAL;
         if(argu.length === 1){
@@ -39,9 +40,9 @@
                 flag = DELAY_STATUS.ID_EXIST;
             }
             var wrapFunc = function(){
-                func.apply(window, [id]);
                 timerList[id] = 0;
                 delete timerList[id];
+                func.apply(funcContext || window, [id]);
             };
             var timer = window.setTimeout(wrapFunc, time);
             timerList[id] = timer;
@@ -56,45 +57,6 @@
             window.clearTimeout(timerList[id]);
             timerList[id] = 0;
             delete timerList[id];
-            return DELAY_STATUS.NORMAL;
-        }
-        return DELAY_STATUS.ID_NOT_EXIST;
-    }
-    
-    var intervalerList = {};
-    
-    /**
-     * 定时循环执行传入的func
-     */
-    this.loop = function(id, time, func){
-        var argu = arguments;
-        var flag = DELAY_STATUS.NORMAL;
-        if(argu.length == 2){
-            func = time;
-            time = id;
-        }
-        time = time || 0;
-        if(id && time){
-            if(id in intervalerList){
-                window.clearInterval(intervalerList[id]);
-                flag = DELAY_STATUS.ID_EXIST;
-            }
-            var wrapFunc = function(){
-                func.apply(window, [id]);
-            };
-            var intervaler = window.setInterval(wrapFunc, time);
-            intervalerList[id] = intervaler;
-        }else{
-            setInterval(func, time);
-        }
-        return flag;
-    }
-    
-    this.clearLoop = function(id){
-        if(id in intervalerList){
-            window.clearInterval(intervalerList[id]);
-            intervalerList[id] = 0;
-            delete intervalerList[id];
             return DELAY_STATUS.NORMAL;
         }
         return DELAY_STATUS.ID_NOT_EXIST;
