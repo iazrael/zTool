@@ -46,5 +46,32 @@
         }
         return result;
     }
+
+    /**
+     * 判断arr是否包含元素o
+     * @memberOf array
+     * @param {Array} arr
+     * @param {Obejct} o
+     * @return {Boolean}
+     */
+    this.contains = function(arr, o){
+        return arr.indexOf(o) > -1;
+    };
+    
+    /**
+     * 对数组进行去重
+     * @memberOf array
+     * @param {Array} arr
+     * @return {Array} 由不重复元素构成的数组
+     */
+    this.uniquelize = function(arr){
+        var result = [];
+        for(var i = 0, len = arr.length; i < len; i++){
+            if(!this.contains(result, arr[i])){
+                result.push(arr[i]);
+            }
+        }
+        return result;
+    };
     
 });

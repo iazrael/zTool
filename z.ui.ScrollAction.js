@@ -1,5 +1,5 @@
 
-;Z.$package('Z.ui', ['.util.delay', 'Z.util.loop'], function(z){
+;Z.$package('Z.ui', ['Z.util'], function(z){
 
     /**
      * 滚动条的通用逻辑封装

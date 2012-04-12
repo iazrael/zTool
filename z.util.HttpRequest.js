@@ -1,5 +1,5 @@
 
-;Z.$package('Z.util', ['Z.message', 'Z.string', 'Z.class.Collection'], function(z){
+;Z.$package('Z.util', ['Z.message', 'Z.string', 'Z.util'], function(z){
     
     /**
      * Http请求的缓存封装
@@ -8,7 +8,7 @@
         init: function(option){
             this._require = option.require;//must fill
             
-            this._requestCollection = new z.class.Collection({
+            this._requestCollection = new z.util.Collection({
                 keyName: 'id'
             });
         },
