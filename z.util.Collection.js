@@ -213,6 +213,16 @@
         },
         getAll: function(){
             return this.getRange(0, this.length());
+        },
+        /**
+         * 遍历 Collection 的所有元素
+         * @param  {Function} callback callback(item, index)
+         * 
+         */
+        each: function(callback){
+            for(var i = 0, item; item = this._arr[i]; i ++){
+                callback(item, i);
+            }
         }
     });
     

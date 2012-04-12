@@ -2,14 +2,15 @@
 ;Z.$package('Z.util', function(z){
     
     /**
-     * debounce 返回一个方法, 在一段时间内多次调用只执行一次
+     * 返回一个方法, 在一段时间内多次调用只执行一次
      * @param  {Number} time 进行调用限制的时间范围
      * @param  {Function} func 需要包装的方法
      * @param  {Boolean} immediate 指示在第一次调用时执行, 还是间隔time毫秒之后执行
      * @return {Function}
      * 
      * @example
-     * function a(){
+     * 
+function a(){
     console.log('exec a');
 }
 var b = debounce(1000, a);
