@@ -22,6 +22,7 @@
             z.message.on(this, 'add', onModify);
             z.message.on(this, 'remove', onModify);
             z.message.on(this, 'clear', onModify);
+            z.message.on(this, 'update', onModify);
         },
         /**
          * 设置一个修改状态位, 每当 collection有了变更, 这个 modifyTime 就会变
@@ -33,11 +34,17 @@
         getModify: function(){
             return this._modifyTime;
         },
+        /**
+         * @deprecated 已废弃, 用 get 代替
+         */
         getByKey: function(key){
-            return this._map[key];
+            return this.get(key);
         },
+        /**
+         * @deprecated 已废弃, 用 index 代替
+         */
         getByIndex: function(index){
-            return this._arr[index];
+            return this.index(index);
         },
         getIndexByKey: function(key, keyName){
             keyName = keyName || this._keyName;
@@ -60,16 +67,20 @@
             return null;
         },
         /**
-         * 根据key的类型自动判断使用
-         * string getByKey
-         * number getByIndex
+         * 返回指定 key 的元素
+         * @param  {Number},{String} key 
+         * @return {Object}
          */
         get: function(key){
-            if(z.isString(key)){
-                return this.getByKey(key);
-            }else{
-                return this.getByIndex(key);
-            }
+            return this._map[key];
+        },
+        /**
+         * 返回指定下标的元素
+         * @param  {Number} index 
+         * @return {Object}
+         */
+        index: function(index){
+            return this._arr[index];
         },
         getRange: function(start, count){
             var end = start + count;
@@ -192,6 +203,34 @@
             }
             return removedItems;
         },
+        update: function(item, noEvent){
+            var exists = this.get(item.id);
+            if(exists){
+                z.merge(exists, item);
+                if(!noEvent){
+                    z.message.notify(this, 'update', {
+                        items: [exists]
+                    });
+                }
+                return exists;
+            }
+            return false;
+        },
+        updateRange: function(items){
+            var updatedItems = [], newItem;
+            for(var i in items){
+                newItem = this.update(items[i], true);
+                if(newItem){
+                    updatedItems.push(newItem);
+                }
+            }
+            if(updatedItems.length){
+                z.message.notify(this, 'update', {
+                    items: [updatedItems]
+                });
+            }
+            return false;
+        },
         length: function(){
             return this._arr.length;
         },
@@ -206,16 +245,16 @@
             }
         },
         getFirst: function() {
-            return this.get(0);
+            return this.index(0);
         },
         getLast: function() {
-            return this.get(this.length() - 1);
+            return this.index(this.length() - 1);
         },
         getAll: function(){
             return this.getRange(0, this.length());
         },
         /**
-         * 遍历 Collection 的所有元素
+         * 按数组下标顺序遍历 Collection 的所有元素
          * @param  {Function} callback callback(item, index)
          * 
          */
@@ -223,6 +262,14 @@
             for(var i = 0, item; item = this._arr[i]; i ++){
                 callback(item, i);
             }
+        },
+        /**
+         * 判断指定 key 的元素是否存在
+         * @param  {Number},{String} key 
+         * @return {Boolean}
+         */
+        exist: function(key){
+            return !!this.get(key);
         }
     });
     

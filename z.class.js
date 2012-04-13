@@ -9,7 +9,7 @@
      * @param {Object} baseObj 基础对象
      * @param {Object} extendObj ... 
      * 
-     * @return {Object} a new baseObj
+     * @return {Object} baseObj
      * 
 	 **/
     var merge = function(baseObj, extendObj1, extendObj2/*, extnedObj3...*/){

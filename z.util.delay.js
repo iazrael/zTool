@@ -20,6 +20,13 @@
      * 2. delay(1000, func)
      * 3. delay(func) === delay(0, func)
      * 4. delay('id02', 1000, func, context)
+     * TODO 5. delay({
+     *     id: 'id03',
+     *     time: 1000,
+     *     func: func,
+     *     context: this,
+     *     onClear: func
+     * })
      */
     this.delay = function(id, time, func, funcContext){
         var argu = arguments;
@@ -47,7 +54,14 @@
             var timer = window.setTimeout(wrapFunc, time);
             timerList[id] = timer;
         }else{
-            window.setTimeout(func, time);
+            if(funcContext){
+                var wrapFunc = function(){
+                    func.apply(funcContext || window);
+                };
+                window.setTimeout(wrapFunc, time);
+            }else{
+                window.setTimeout(func, time);
+            }
         }
         return flag;
     }
