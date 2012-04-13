@@ -174,16 +174,10 @@
             return false;
         },
         /**
-         * 根据key的类型自动判断使用
-         * string removeByKey
-         * number removeByIndex
+         * 删除指定key的元素, removeByKey 的简写
          */
         remove: function(key){
-            if(J.isString(key)){
-                return this.removeByKey(key);
-            }else{
-                return this.removeByIndex(key);
-            }
+            return this.removeByKey(key);
         },
         removeRange: function(items, noEvent){
             var removedItems = [], item, keyName = this._keyName;
