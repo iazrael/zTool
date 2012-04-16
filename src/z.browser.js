@@ -47,7 +47,7 @@
      * @param {Boolean} checkPrivate 指定是否尝试检测浏览器的私有支持 @default false @optional
      */
     this.cssSupport = function(property, value, checkPrivate){
-        throw new Error('not support');
+        // throw new Error('not support');
         var element = getCheckerElement();
         if(property in element.style){//TODO 不够完善
             element.style[property] = value;
