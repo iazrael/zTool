@@ -13,7 +13,7 @@
     </target>
 
     <target name="concat" depends="init">
-        <concat destfile="${build}/ztool.all.js" encoding="${charset}" outputencoding="${charset}">
+        <concat destfile="${build}/ztool.all.uncompressed.js" encoding="${charset}" outputencoding="${charset}">
             <path path="${src}/z.core.js" />
             <path path="${src}/z.base.js" />
             <path path="${src}/z.class.js" />
@@ -47,7 +47,7 @@
     
     <target name="compress" depends="concat">
         <java jar="${lib}/compiler.jar" fork="true">
-            <arg line="--charset ${charset} --js='${build}/ztool.all.js' --js_output_file='${build}/ztool.all.compressed.js'" />
+            <arg line="--charset ${charset} --js='${build}/ztool.all.uncompressed.js' --js_output_file='${build}/ztool.all.js'" />
         </java>
     </target>
 
