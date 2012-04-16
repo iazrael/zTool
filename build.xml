@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="iTally" default="clean" basedir="./">
+	
+	<description>Tally Book II</description>
+	
+    <property name="src" location="${basedir}/src"/>
+	<property name="build" location="${basedir}"/>
+	<property name="lib" location="${basedir}/lib"/>
+    
+	<property name="charset" value="utf-8"/>
+    
+    <target name="init">
+    </target>
+
+    <target name="concat" depends="init">
+        <concat destfile="${build}/ztool.all.js" encoding="${charset}" outputencoding="${charset}">
+            <path path="${src}/z.core.js" />
+            <path path="${src}/z.base.js" />
+            <path path="${src}/z.class.js" />
+            <path path="${src}/z.message.js" />
+
+            <path path="${src}/z.array.js" />
+            <path path="${src}/z.browser.js" />
+            <path path="${src}/z.cookie.js" />
+            <path path="${src}/z.date.js" />
+
+            <path path="${src}/z.dom.ellipsis.js" />
+            <path path="${src}/z.dom.js" />
+
+            <path path="${src}/z.number.js" />
+            <path path="${src}/z.storage.js" />
+            <path path="${src}/z.string.js" />
+
+            <path path="${src}/z.ui.ScrollAction.js" />
+
+            <path path="${src}/z.util.Beater.js" />
+            <path path="${src}/z.util.Collection.js" />
+            <path path="${src}/z.util.debounce.js" />
+            <path path="${src}/z.util.delay.js" />
+            <path path="${src}/z.util.DependentQueue.js" />
+            <path path="${src}/z.util.HttpRequest.js" />
+            <path path="${src}/z.util.loop.js" />
+            <path path="${src}/z.util.timetaken.js" />
+        
+        </concat>
+    </target>
+    
+    <target name="compress" depends="concat">
+        <java jar="${lib}/compiler.jar" fork="true">
+            <arg line="--charset ${charset} --js='${build}/ztool.all.js' --js_output_file='${build}/ztool.all.compressed.js'" />
+        </java>
+    </target>
+
+    <target name="clean" depends="compress">
+        
+	</target>
+</project>
