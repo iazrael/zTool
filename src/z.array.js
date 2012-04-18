@@ -74,4 +74,13 @@
         return result;
     };
     
+    /**
+     * 把伪数组转换成速组, 如 NodeList , Arguments等有下标和length的对象
+     * @param  {Object}, {NodeList} obj 
+     * @return {Array}
+     */
+    this.parse = function(obj){
+        return Array.prototype.slice.call(obj);
+    }
+
 });
