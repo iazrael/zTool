@@ -8,6 +8,7 @@
      * @param {String} ellipsisText @optional
      */
     this.ellipsis = function(element, ellipsisText){
+        //TODO 多行支持
         var limitWidth = element.clientWidth;
         ellipsisText = ellipsisText || '…';
         var temp = element.cloneNode(true);
