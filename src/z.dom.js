@@ -5,6 +5,7 @@
 
     /**
      * shot of getElementById
+     * @param {String} id 
      */
     this.get = function(id){
         return document.getElementById(id);
@@ -36,7 +37,7 @@
      * @param {Event}
      *            event
      * @param {Int}
-     *            level 指定寻找的层次
+     *            level 指定寻找的层次, 默认 3
      * @param {String}
      *            property 查找具有特定属性的target,默认为cmd
      * @param {HTMLElement} parent 指定查找结束点, 默认为document.body
@@ -91,6 +92,10 @@
     }
     
     /**
+     * @param  {HTMLElement}  targetElement   
+     * @param  {String}  eventName 触发命令的事件名
+     * @param {Object} commends 命令对象
+     * 
      * @example
      * bindCommends(cmds);
      * bindCommends(el, cmds);
@@ -127,6 +132,36 @@
                 }
             }
         });
+    }
+    /**
+     * 判断 element 在 reference 中是否可见, reference 最好是可滚动的
+     * @param  {HTMLElement}  element   
+     * @param  {HTMLElement}  reference 
+     * @param {Boolean} strict 指定严格模式, 若为 true, 则需要 element 完全在可视区才返回 true
+     * @return {Boolean} 可见范围中返回 true
+     */
+    this.isVisible = function(element, reference, strict){
+        // return strict 
+        //         ? element.offsetTop - reference.scrollTop >= 0 && 
+        //             element.offsetTop + element.clientHeight - reference.scrollTop <= reference.clientHeight
+        //         : element.offsetTop + element.clientHeight - reference.scrollTop > 0 && 
+        //             element.offsetTop - reference.scrollTop < reference.clientHeight;
+        if(strict){
+            if(element.offsetTop - reference.scrollTop >= 0 && 
+                element.offsetTop + element.clientHeight - reference.scrollTop <= reference.clientHeight){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            if(element.offsetTop + element.clientHeight - reference.scrollTop > 0 && 
+                element.offsetTop - reference.scrollTop < reference.clientHeight){
+                return true;
+            }else{
+                return false;
+            }
+        }
+        
     }
     
 });
