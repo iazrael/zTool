@@ -80,6 +80,7 @@
      * @return {Object} 返回最大最小值组成的对象,{max,min}
      */
     this.getMaxMin = function(array){
+        //TODO 这个方法的实现太搓, 是病, 得治
         var max = 0, min = 0, len = array.length;
         if(len > 0){
             min = array[0];
@@ -92,6 +93,16 @@
             }
         }
         return {max: max,min: min};
+    }
+
+    /**
+     * 返回指定范围的随机整数, 如 (9, 15], 将返回 9 < n <= 15, 不包括 9 本身
+     * @param  {Number} start 随机数下限, 不包括下限
+     * @param  {Number} end   随机数上限, 包括上限
+     * @return {Number}
+     */
+    this.random = function(start, end){
+        return Math.ceil(Math.random()*(end - start) + start);
     }
     
 });
