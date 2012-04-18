@@ -1,4 +1,4 @@
-A javascript common tools
+A javascript common tools(not support ie!)
 
 License
 
