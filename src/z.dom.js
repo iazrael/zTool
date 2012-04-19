@@ -134,18 +134,13 @@
         });
     }
     /**
-     * 判断 element 在 reference 中是否可见, reference 最好是可滚动的
+     * 判断 element 在 reference 中是否可见, reference 必须是 relative 或 absolute  定位, 最好是可滚动的
      * @param  {HTMLElement}  element   
      * @param  {HTMLElement}  reference 
      * @param {Boolean} strict 指定严格模式, 若为 true, 则需要 element 完全在可视区才返回 true
      * @return {Boolean} 可见范围中返回 true
      */
     this.isVisible = function(element, reference, strict){
-        // return strict 
-        //         ? element.offsetTop - reference.scrollTop >= 0 && 
-        //             element.offsetTop + element.clientHeight - reference.scrollTop <= reference.clientHeight
-        //         : element.offsetTop + element.clientHeight - reference.scrollTop > 0 && 
-        //             element.offsetTop - reference.scrollTop < reference.clientHeight;
         if(strict){
             if(element.offsetTop - reference.scrollTop >= 0 && 
                 element.offsetTop + element.clientHeight - reference.scrollTop <= reference.clientHeight){
@@ -161,7 +156,6 @@
                 return false;
             }
         }
-        
     }
     
 });
