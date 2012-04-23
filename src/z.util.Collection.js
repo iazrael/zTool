@@ -86,9 +86,22 @@
             var end = start + count;
             return this._arr.slice(start, end);
         },
+        /**
+         * 使用指定 key 和 value 进行过滤
+         * @param  {Number}, {String} key
+         * @param  {Object} value 
+         * @return {Array}
+         */
         filter: function(key, value){
             return z.array.filter(this._arr, key, value);
         },
+        /**
+         * 添加元素, 只接受新的 key
+         * @param  {Object} item    
+         * @param  {Number} index   
+         * @param  {Boolean} noEvent 
+         * @return {Object}, {Boolean}
+         */
         add: function(item, index, noEvent){
             var existItem = this._map[item[this._keyName]];
             if(existItem){
@@ -197,6 +210,12 @@
             }
             return removedItems;
         },
+        /**
+         * 更新一个元素
+         * @param  {Object} item    
+         * @param  {Boolean} noEvent 
+         * @return {Object}, {Boolean}
+         */
         update: function(item, noEvent){
             var exists = this.get(item.id);
             if(exists){
