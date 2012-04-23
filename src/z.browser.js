@@ -1,9 +1,9 @@
 
 ;Z.$package('Z.browser', function(z){
     var packageContext = this;
-	
+    
     (function(){
-		var browser = {};
+        var browser = {};
         browser.set = function(name, version){
             this.name = name;
             this.version = version;
@@ -15,9 +15,9 @@
         (s = ua.match(/chrome\/([\d.]+)/)) ? browser.set("chrome",(s[1])) :
         (s = ua.match(/opera.([\d.]+)/)) ? browser.set("opera",(s[1])) :
         (s = ua.match(/version\/([\d.]+).*safari/)) ? browser.set("safari",(s[1])) : 0;
-		
-		Z.merge(packageContext, browser);
-		
+        
+        Z.merge(packageContext, browser);
+        
     })();
     
     var privatePrefixs = {
