@@ -233,14 +233,14 @@
     var emptyFunction = function(){};
 
     /**
-	 * 合并几个对象并返回 baseObj,
+     * 合并几个对象并返回 baseObj,
      * 如果 extendObj 有数组属性, 则直接拷贝引用
      * @param {Object} baseObj 基础对象
      * @param {Object} extendObj ... 
      * 
      * @return {Object} baseObj
      * 
-	 **/
+     **/
     var merge = function(baseObj, extendObj1, extendObj2/*, extnedObj3...*/){
         var argu = arguments;
         var extendObj;
@@ -293,16 +293,16 @@
     }
 
     /**
-	 * 定义类
-	 * @param {Object} option , 可指定 extend 和 implements, statics
+     * 定义类
+     * @param {Object} option , 可指定 extend 和 implements, statics
      * {extend: {Class}, //继承的父类
      * implements: [{Interface}],//所实现的接口
      * name: {String}, //类名
      * statics: {{String}: {Function}||{Object}},//定义的静态变量和方法
      * }
      * 
-	 * @param {Object} prototype, 原型链, 必须要有 init 方法
-	 **/
+     * @param {Object} prototype, 原型链, 必须要有 init 方法
+     **/
     var defineClass = function(option, prototype){
         if(arguments.length === 1){
             prototype = option;
@@ -379,8 +379,8 @@
     }
     
     /**
-	 * 判断传入类是否是接口
-	 **/
+     * 判断传入类是否是接口
+     **/
     var isInterface = function(cls){
         if(cls.type === 'interface' && z.isArray(cls.methods) && z.isFunction(cls.checkImplements)){
             return true;
@@ -409,9 +409,9 @@
         return this.interfaceName;
     }
 
-	/**
-	 * 定义接口
-	 **/
+    /**
+     * 定义接口
+     **/
     var defineInterface = function(option, methods){
         if(arguments.length === 1){
             methods = option;
@@ -428,7 +428,7 @@
     }
     
     /**
-	 * 定义类或接口
+     * 定义类或接口
      * @example
      *  var A = define('class', {
             name: 'classA'
@@ -471,7 +471,7 @@
             }
         });
      *
-	 **/
+     **/
     var define = function(type, option, prototype){
         var args = Array.prototype.slice.call(arguments, 1);
         if(type === 'class'){
@@ -835,13 +835,22 @@
         return result;
     };
     
+    /**
+     * 把伪数组转换成速组, 如 NodeList , Arguments等有下标和length的对象
+     * @param  {Object}, {NodeList} obj 
+     * @return {Array}
+     */
+    this.parse = function(obj){
+        return Array.prototype.slice.call(obj);
+    }
+
 });
 
 ;Z.$package('Z.browser', function(z){
     var packageContext = this;
-	
+    
     (function(){
-		var browser = {};
+        var browser = {};
         browser.set = function(name, version){
             this.name = name;
             this.version = version;
@@ -853,9 +862,9 @@
         (s = ua.match(/chrome\/([\d.]+)/)) ? browser.set("chrome",(s[1])) :
         (s = ua.match(/opera.([\d.]+)/)) ? browser.set("opera",(s[1])) :
         (s = ua.match(/version\/([\d.]+).*safari/)) ? browser.set("safari",(s[1])) : 0;
-		
-		Z.merge(packageContext, browser);
-		
+        
+        Z.merge(packageContext, browser);
+        
     })();
     
     var privatePrefixs = {
@@ -1011,6 +1020,7 @@
      * @param {String} ellipsisText @optional
      */
     this.ellipsis = function(element, ellipsisText){
+        //TODO 多行支持
         var limitWidth = element.clientWidth;
         ellipsisText = ellipsisText || '…';
         var temp = element.cloneNode(true);
@@ -1048,6 +1058,7 @@
 
     /**
      * shot of getElementById
+     * @param {String} id 
      */
     this.get = function(id){
         return document.getElementById(id);
@@ -1079,7 +1090,7 @@
      * @param {Event}
      *            event
      * @param {Int}
-     *            level 指定寻找的层次
+     *            level 指定寻找的层次, 默认 3
      * @param {String}
      *            property 查找具有特定属性的target,默认为cmd
      * @param {HTMLElement} parent 指定查找结束点, 默认为document.body
@@ -1134,6 +1145,10 @@
     }
     
     /**
+     * @param  {HTMLElement}  targetElement   
+     * @param  {String}  eventName 触发命令的事件名
+     * @param {Object} commends 命令对象
+     * 
      * @example
      * bindCommends(cmds);
      * bindCommends(el, cmds);
@@ -1170,6 +1185,30 @@
                 }
             }
         });
+    }
+    /**
+     * 判断 element 在 reference 中是否可见, reference 必须是 relative 或 absolute  定位, 最好是可滚动的
+     * @param  {HTMLElement}  element   
+     * @param  {HTMLElement}  reference 
+     * @param {Boolean} strict 指定严格模式, 若为 true, 则需要 element 完全在可视区才返回 true
+     * @return {Boolean} 可见范围中返回 true
+     */
+    this.isVisible = function(element, reference, strict){
+        if(strict){
+            if(element.offsetTop - reference.scrollTop >= 0 && 
+                element.offsetTop + element.clientHeight - reference.scrollTop <= reference.clientHeight){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            if(element.offsetTop + element.clientHeight - reference.scrollTop > 0 && 
+                element.offsetTop - reference.scrollTop < reference.clientHeight){
+                return true;
+            }else{
+                return false;
+            }
+        }
     }
     
 });
@@ -1255,6 +1294,7 @@
      * @return {Object} 返回最大最小值组成的对象,{max,min}
      */
     this.getMaxMin = function(array){
+        //TODO 这个方法的实现太搓, 是病, 得治
         var max = 0, min = 0, len = array.length;
         if(len > 0){
             min = array[0];
@@ -1267,6 +1307,16 @@
             }
         }
         return {max: max,min: min};
+    }
+
+    /**
+     * 返回指定范围的随机整数, 如 (9, 15], 将返回 9 < n <= 15, 不包括 9 本身
+     * @param  {Number} start 随机数下限, 不包括下限
+     * @param  {Number} end   随机数上限, 包括上限
+     * @return {Number}
+     */
+    this.random = function(start, end){
+        return Math.ceil(Math.random()*(end - start) + start);
     }
     
 });
@@ -1774,9 +1824,22 @@
             var end = start + count;
             return this._arr.slice(start, end);
         },
+        /**
+         * 使用指定 key 和 value 进行过滤
+         * @param  {Number}, {String} key
+         * @param  {Object} value 
+         * @return {Array}
+         */
         filter: function(key, value){
             return z.array.filter(this._arr, key, value);
         },
+        /**
+         * 添加元素, 只接受新的 key
+         * @param  {Object} item    
+         * @param  {Number} index   
+         * @param  {Boolean} noEvent 
+         * @return {Object}, {Boolean}
+         */
         add: function(item, index, noEvent){
             var existItem = this._map[item[this._keyName]];
             if(existItem){
@@ -1885,6 +1948,12 @@
             }
             return removedItems;
         },
+        /**
+         * 更新一个元素
+         * @param  {Object} item    
+         * @param  {Boolean} noEvent 
+         * @return {Object}, {Boolean}
+         */
         update: function(item, noEvent){
             var exists = this.get(item.id);
             if(exists){
