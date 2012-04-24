@@ -109,6 +109,8 @@
                 //把父类被重写的方法赋给子类实例
                 var that = this;
                 this.$super = {};//TODO 这里有问题, 不能向上找父类的父类
+                //TODO 严重问题, A <- B <- C
+                //b调用了$super, c调用了$super的时候有死循环
                 for(var prop in superPrototype){
                     if(z.isFunction(superPrototype[prop]) && newPrototype[prop]){//子类重写了的方法, 才覆盖
                         this.$super[prop] = (function(prop){
