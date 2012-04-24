@@ -4,14 +4,14 @@
     var emptyFunction = function(){};
 
     /**
-	 * 合并几个对象并返回 baseObj,
+     * 合并几个对象并返回 baseObj,
      * 如果 extendObj 有数组属性, 则直接拷贝引用
      * @param {Object} baseObj 基础对象
      * @param {Object} extendObj ... 
      * 
      * @return {Object} baseObj
      * 
-	 **/
+     **/
     var merge = function(baseObj, extendObj1, extendObj2/*, extnedObj3...*/){
         var argu = arguments;
         var extendObj;
@@ -64,16 +64,16 @@
     }
 
     /**
-	 * 定义类
-	 * @param {Object} option , 可指定 extend 和 implements, statics
+     * 定义类
+     * @param {Object} option , 可指定 extend 和 implements, statics
      * {extend: {Class}, //继承的父类
      * implements: [{Interface}],//所实现的接口
      * name: {String}, //类名
      * statics: {{String}: {Function}||{Object}},//定义的静态变量和方法
      * }
      * 
-	 * @param {Object} prototype, 原型链, 必须要有 init 方法
-	 **/
+     * @param {Object} prototype, 原型链, 必须要有 init 方法
+     **/
     var defineClass = function(option, prototype){
         if(arguments.length === 1){
             prototype = option;
@@ -152,8 +152,8 @@
     }
     
     /**
-	 * 判断传入类是否是接口
-	 **/
+     * 判断传入类是否是接口
+     **/
     var isInterface = function(cls){
         if(cls.type === 'interface' && z.isArray(cls.methods) && z.isFunction(cls.checkImplements)){
             return true;
@@ -182,9 +182,9 @@
         return this.interfaceName;
     }
 
-	/**
-	 * 定义接口
-	 **/
+    /**
+     * 定义接口
+     **/
     var defineInterface = function(option, methods){
         if(arguments.length === 1){
             methods = option;
@@ -201,7 +201,7 @@
     }
     
     /**
-	 * 定义类或接口
+     * 定义类或接口
      * @example
      *  var A = define('class', {
             name: 'classA'
@@ -244,7 +244,7 @@
             }
         });
      *
-	 **/
+     **/
     var define = function(type, option, prototype){
         var args = Array.prototype.slice.call(arguments, 1);
         if(type === 'class'){
