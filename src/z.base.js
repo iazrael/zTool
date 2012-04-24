@@ -5,15 +5,22 @@
     
     /**
      * 简易的 debug 方法, 没有 console 则不起任何作用
-     * @param  {[type]} data [description]
-     * @return {[type]}
+     * @param  {Object} data 
      */
     this.debug = function(data){
-        window.console ? 
-        console.debug ? console.debug(data) : console.log(data);
+        if(window.console){
+            console.debug ? console.debug(data) : console.log(data);
+        }else{
+            //alert(data);
+        }
     };
 
     var toString = Object.prototype.toString;
+
+    this.is = function(type, obj) {
+        var clas = toString.call(obj).slice(8, -1);
+        return obj !== undefined && obj !== null && clas === type;
+    }
     
     this.isString = function(obj){
         return toString.call(obj) === '[object String]';

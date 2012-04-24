@@ -186,7 +186,6 @@
      * init the library
      */
     $package(LIBRARY_NAME, function(z){
-        z.debug = debug;
         
         z.PACKAGE_STATUS = PACKAGE_STATUS;
         z.$package = $package;
@@ -195,11 +194,109 @@
         
     });
     
-})();/**
+})();
+;Z.$package('Z.array', function(z){
+    
+    /**
+     * 从给定数组移除指定元素, 只删除一个
+     * @param  {Array} arr  
+     * @param  {Object},{String} key or item
+     * @param {Object} value @optional 指定值
+     * @return {Boolean}      找到并移除返回 true
+     */
+    this.remove = function(arr, key, value){
+        var flag = false;
+        if(arguments.length === 2){//两个参数
+            var item = key;
+            var index = arr.indexOf(item);
+            if(index !== -1){
+                arr.splice(index, 1);
+                flag = true;
+            }
+            return flag;
+        }else{
+            for(var i = 0, len = arr.length; i < len; i++){
+                if(arr[i][key] === value){
+                    arr.splice(i, 1);
+                    flag = true;
+                    break;
+                }
+            }
+            return flag;
+        }
+    };
+
+    /**
+     * 根据指定 key 和 value 进行筛选
+     * @param  {Array} arr   
+     * @param  {String} key   
+     * @param  {Object} value 
+     * @return {Array}       
+     */
+    this.filter = function(arr, key, value){
+        var result = [];
+        for(var i in arr){
+            if(arr[i][key] === value){
+                result.push(arr[i]);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 判断arr是否包含元素o
+     * @memberOf array
+     * @param {Array} arr
+     * @param {Obejct} o
+     * @return {Boolean}
+     */
+    this.contains = function(arr, o){
+        return arr.indexOf(o) > -1;
+    };
+    
+    /**
+     * 对数组进行去重
+     * @memberOf array
+     * @param {Array} arr
+     * @return {Array} 由不重复元素构成的数组
+     */
+    this.uniquelize = function(arr){
+        var result = [];
+        for(var i = 0, len = arr.length; i < len; i++){
+            if(!this.contains(result, arr[i])){
+                result.push(arr[i]);
+            }
+        }
+        return result;
+    };
+    
+    /**
+     * 把伪数组转换成速组, 如 NodeList , Arguments等有下标和length的对象
+     * @param  {Object}, {NodeList} obj 
+     * @return {Array}
+     */
+    this.parse = function(obj){
+        return Array.prototype.slice.call(obj);
+    }
+
+});
+/**
  * 一些最基本的方法, 提供简单的访问方式
  */
 ;Z.$package('Z', function(z){
     
+    /**
+     * 简易的 debug 方法, 没有 console 则不起任何作用
+     * @param  {Object} data 
+     */
+    this.debug = function(data){
+        if(window.console){
+            console.debug ? console.debug(data) : console.log(data);
+        }else{
+            //alert(data);
+        }
+    };
+
     var toString = Object.prototype.toString;
     
     this.isString = function(obj){
@@ -226,11 +323,23 @@
         return toString.call(obj) === '[object Undefined]';
     }
     
-    
-});
-;Z.$package('Z', function(z){
-    
-    var emptyFunction = function(){};
+    /**
+     * 判断对象或数组是否为空, 如{},[]责返回false
+     * @param  {Object} 
+     * @return {Boolean}
+     */
+    this.isEmpty = function(obj){
+        if(!obj){
+            return false;
+        }else if(this.isArray(obj)){
+            return !!obj.length;
+        }else{
+            for(var i in obj){  
+                return false;
+            }
+            return true;
+        }
+    }
 
     /**
      * 合并几个对象并返回 baseObj,
@@ -286,6 +395,101 @@
     }
 
     /**
+     * 使子类简单继承父类, 仅仅将父类的静态属性方法和实例属性方法拷贝给子类
+     * @param  {Function} child  子类
+     * @param  {Function} parent 父类
+     * @return {Function} child 
+     * @example
+     * function parent(){
+     * }
+     * parent.prototype {};
+     * function child(){
+     * }
+     * child.prototype = {};
+     * extend(child, parent);
+     */
+    var extend = function(child, parent){
+        //继承 parent 的静态方法
+        merge(child, parent);
+        //继承 parent 的 prototype
+        child.prototype = merge({}, parent.prototype, child.prototype);
+    }
+
+    this.merge = merge;
+    this.duplicate = duplicate;
+    this.extend = extend;
+    
+});
+;Z.$package('Z.browser', function(z){
+    var packageContext = this;
+    
+    (function(){
+        var browser = {};
+        browser.set = function(name, version){
+            this.name = name;
+            this.version = version;
+            this[name] = version;
+        };
+        var s, ua = navigator.userAgent.toLowerCase();
+        (s = ua.match(/msie ([\d.]+)/)) ? browser.set("ie",(s[1])):
+        (s = ua.match(/firefox\/([\d.]+)/)) ? browser.set("firefox",(s[1])) :
+        (s = ua.match(/chrome\/([\d.]+)/)) ? browser.set("chrome",(s[1])) :
+        (s = ua.match(/opera.([\d.]+)/)) ? browser.set("opera",(s[1])) :
+        (s = ua.match(/version\/([\d.]+).*safari/)) ? browser.set("safari",(s[1])) : 0;
+        
+        Z.merge(packageContext, browser);
+        
+    })();
+    
+    var privatePrefixs = {
+        ie: 'Ms',
+        firefox: 'Moz',
+        opera: 'O',
+        chrome: 'Webkit',
+        safari: 'Webkit'
+    };
+    var getPrivatePrefix = function(browserName){
+        return privatePrefixs[browserName || z.browser.name];
+    };
+    
+    var checkerElement;
+    
+    var getCheckerElement = function(){
+        if(!checkerElement){
+            checkerElement = document.createElement('div');
+        }
+        return checkerElement;
+    }
+    
+    /**
+     * 检测 css 的支持
+     * @param {String} property 指定需要检测的属性
+     * @param {String} value 检测是否支持指定值 @optional
+     * @param {Boolean} checkPrivate 指定是否尝试检测浏览器的私有支持 @default false @optional
+     */
+    this.cssSupport = function(property, value, checkPrivate){
+        // throw new Error('not support');
+        var element = getCheckerElement();
+        if(property in element.style){//TODO 不够完善
+            element.style[property] = value;
+            return element.style[property] === value;
+        }else if(checkPrivate){
+            var firstChar = property.charAt(0).toUpperCase();
+            property = getPrivatePrefix() + firstChar + property.substr(1);
+            return cssSupport(property, false, value);
+        }else{
+            return false;
+        }
+    }
+    
+    
+});
+
+;Z.$package('Z', function(z){
+    
+    var emptyFunction = function(){};
+
+    /**
      * @ignore
      */
     var _classToString = function(){
@@ -315,7 +519,7 @@
            prototype.init = emptyFunction;
         }
         var newClass = function(){
-            z.debug( 'class [' + newClass.className + '] init');
+            // z.debug( 'class [' + newClass.className + '] init');
             return this.init.apply(this, arguments);
         };
         var superClass = option.extend;
@@ -325,19 +529,21 @@
             }
             var superInit = superClass.prototype.init;
             var thisInit = prototype.init;//释放传入 prototype 变量的引用, 以便内存回收
-            var superPrototype = duplicate(superClass.prototype);
+            var superPrototype = z.duplicate(superClass.prototype);
             delete superPrototype.init;
-            newClass.prototype = merge({}, superClass.prototype, prototype);
+            newClass.prototype = z.merge({}, superClass.prototype, prototype);
             var newPrototype = prototype;
             newClass.prototype.init = function(){
-                var argus = duplicate(arguments);
+                var argus = z.duplicate(arguments);
                 superInit.apply(this, argus);
                 this.$static = newClass;//提供更快速的访问类方法的途径
-                argus = duplicate(arguments);
+                argus = z.duplicate(arguments);
                 thisInit.apply(this, argus);
                 //把父类被重写的方法赋给子类实例
                 var that = this;
                 this.$super = {};//TODO 这里有问题, 不能向上找父类的父类
+                //TODO 严重问题, A <- B <- C
+                //b调用了$super, c调用了$super的时候有死循环
                 for(var prop in superPrototype){
                     if(z.isFunction(superPrototype[prop]) && newPrototype[prop]){//子类重写了的方法, 才覆盖
                         this.$super[prop] = (function(prop){
@@ -373,7 +579,7 @@
             }
         }
         if(option.statics){
-            merge(newClass, option.statics);
+            z.merge(newClass, option.statics);
         }
         return newClass;
     }
@@ -482,10 +688,7 @@
         
     }
     
-    this.merge = merge;
-    this.duplicate = duplicate;
     this.define = define;
-    
     this.$class = defineClass;
     this.$interface = defineInterface;
     
@@ -553,364 +756,7 @@
 //    console.log(D);
     console.log(d);
     console.log(d.constructor); */
-});/**
- * @namespace Z.message
- * zTool 使用全局的消息通知机制, 需要监听消息的模块调用addListener注册一个回调函数,
- * 当有指定消息到达时触发
- */
-;Z.$package('Z.message', function(z) {
-    var IE_CUSTOM_EVENT = 'onpropertychange';
-    var IE_EVENT_ELEMENT_STYLE = 'position: absolute; top: -9999em; left: -9999em; width: 0px; height: 0px;';
-
-    var eventElement;
-
-    var increaseId = 0;
-
-    var getEventElement = function() {
-        if (!eventElement) {
-            eventElement = document.createElement('div');
-            if (!document.createEvent) {
-                eventElement.style.cssText = IE_EVENT_ELEMENT_STYLE;
-                document.body.appendChild(eventElement);
-            }
-        }
-        return eventElement;
-    }
-
-    var getListenerId = function(){
-        return +new Date + '' + increaseId++ ;
-    }
-
-    /**
-     * 添加事件监听
-     * @param {Object} model 消息的挂载目标, 可选, 默认为 window
-     * @param {String} type 消息类型
-     * @param {Function} func 监听函数
-     * func 的调用参数为 ({String}: type, {Object}: message)
-     */
-    var addListener = function(model, type, func) {
-        var listener;
-        var wrapFunc;
-        var element;
-        var listeners;
-        var listenerId;
-        if(arguments.length < 2){
-            throw new Error('addListener arguments not enough');
-        }else if (arguments.length === 2) {
-            func = type;
-            type = model;
-            model = window;
-        }
-        if (!model.__listeners) {
-            model.__listeners = {};
-            model.__listenerId = getListenerId();
-        }
-        listeners = model.__listeners;
-        listenerId = model.__listenerId;
-        if (!listeners[type]) {
-            listeners[type] = [];
-        } else {
-            for (var i in listeners[type]) {
-                listener = listeners[type][i];
-                if (listener.func === func) {
-                    return false;
-                }
-            }
-        }
-        element = getEventElement();
-        if (element.addEventListener) {
-            wrapFunc = function(e) {
-                func.apply(window, e.params);
-            }
-            element.addEventListener(listenerId + '-' + type, wrapFunc, false);
-        } else {
-            wrapFunc = function(e) {
-                e = window.event;
-                //TODO ie8及以下的浏览器后绑定的方法先执行, 导致触发的事件执行顺序倒过来了
-                //没精力去自己实现顺序执行, 先这样吧
-                var lid = e.params.pop();
-                if (type === e.params[1] && lid === listenerId) {
-                    func.apply(window, e.params);
-                }
-            }
-            element.attachEvent(IE_CUSTOM_EVENT, wrapFunc);
-        }
-        listener = {
-            func: func,
-            wrapFunc: wrapFunc
-        };
-        listeners[type].push(listener);
-        return true;
-    }
-    /**
-     * 移除事件监听
-     * @param {Object} model 消息的挂载目标, 可选, 默认为 window
-     * @param {String} type
-     * @param {Function} func 监听函数
-     */
-    var removeListener = function(model, type, func) {
-        var listener;
-        var element;
-        var listeners;
-        var listenerId;
-        if(arguments.length < 2){
-            throw new Error('removeListener arguments not enough');
-        }else if (arguments.length === 2) {
-            func = type;
-            type = model;
-            model = window;
-        }
-        listeners = model.__listeners;
-        listenerId = model.__listenerId;
-        if (!listeners || !listeners[type]) {
-            return false;
-        }
-        element = getEventElement();
-        // TODO 这个支持有存在的必要吗
-        // if (!func) {
-        //     for (var i in listeners[type]) {
-        //         listener = listeners[type][i];
-        //         if (element.removeEventListener) {
-        //             element.removeEventListener(type, listener.wrapFunc, false);
-        //         } else {
-        //             element.detachEvent(IE_CUSTOM_EVENT, listener.wrapFunc);
-        //         }
-        //     }
-        //     listeners[type] = null;
-        //     delete listeners[type];
-        //     return true;
-        // }
-        for (var i in listeners[type]) {
-            listener = listeners[type][i];
-            if (listener.func === func) {
-                listeners[type].slice(i, 1);
-                if (element.removeEventListener) {
-                    element.removeEventListener(listenerId + '-' + type, listener.wrapFunc, false);
-                } else {
-                    element.detachEvent(IE_CUSTOM_EVENT, listener.wrapFunc);
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /** 
-     * 向消息的监听者广播一条消息
-     * @param {Object} model 消息的挂载目标, 可选, 默认为 window
-     * @param {String} type ,消息类型
-     * @param {Object} message, 消息体, 可选
-     * @example
-     * var func1 = function(type, message){
-            console.log('help!!!!! don\t kill me ..... call 110.');
-            throw '110';
-        }
-        
-        z.message.on('kill', func1);
-        
-        z.message.on('kill', function(type, message){
-            console.log('ok, i m dead.');
-            
-        });
-        
-        //notify it
-        z.message.notify('kill')
-        //or 
-        z.message.notify(window, 'kill')
-     *
-     */
-    var notify = function(model, type, message) {
-        var element;
-        var event;
-        var listeners;
-        var listenerId;
-        if (arguments.length === 1) {
-            type = model;
-            model = window;
-        }else if (arguments.length === 2 && z.isString(model)) {
-            message = type;
-            type = model;
-            model = window;
-        }
-        z.debug('notify message: ' + type);
-        listeners = model.__listeners;
-        listenerId = model.__listenerId;
-        if (!listeners || !listeners[type]) {
-            return false;
-        }
-
-        element = getEventElement();
-        if (document.createEvent) {
-            event = document.createEvent('Events');
-            event.initEvent(listenerId + '-' + type, false, false);
-            event.params = [message, type];
-            element.dispatchEvent(event);
-        } else {
-            event = document.createEventObject(IE_CUSTOM_EVENT);
-            event.params = [message, type, listenerId];
-            element.fireEvent(IE_CUSTOM_EVENT, event);
-        }
-        return listeners[type].length !== 0;
-    }
-
-    this.addListener = addListener;
-    this.on = addListener;
-    this.removeListener = removeListener;
-    this.off = removeListener;
-    this.notify = notify;
 });
-
-;Z.$package('Z.array', function(z){
-    
-    /**
-     * 从给定数组移除指定元素, 只删除一个
-     * @param  {Array} arr  
-     * @param  {Object},{String} key or item
-     * @param {Object} value @optional 指定值
-     * @return {Boolean}      找到并移除返回 true
-     */
-    this.remove = function(arr, key, value){
-        var flag = false;
-        if(arguments.length === 2){//两个参数
-            var item = key;
-            var index = arr.indexOf(item);
-            if(index !== -1){
-                arr.splice(index, 1);
-                flag = true;
-            }
-            return flag;
-        }else{
-            for(var i = 0, len = arr.length; i < len; i++){
-                if(arr[i][key] === value){
-                    arr.splice(i, 1);
-                    flag = true;
-                    break;
-                }
-            }
-            return flag;
-        }
-    };
-
-    /**
-     * 根据指定 key 和 value 进行筛选
-     * @param  {Array} arr   
-     * @param  {String} key   
-     * @param  {Object} value 
-     * @return {Array}       
-     */
-    this.filter = function(arr, key, value){
-        var result = [];
-        for(var i in arr){
-            if(arr[i][key] === value){
-                result.push(arr[i]);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * 判断arr是否包含元素o
-     * @memberOf array
-     * @param {Array} arr
-     * @param {Obejct} o
-     * @return {Boolean}
-     */
-    this.contains = function(arr, o){
-        return arr.indexOf(o) > -1;
-    };
-    
-    /**
-     * 对数组进行去重
-     * @memberOf array
-     * @param {Array} arr
-     * @return {Array} 由不重复元素构成的数组
-     */
-    this.uniquelize = function(arr){
-        var result = [];
-        for(var i = 0, len = arr.length; i < len; i++){
-            if(!this.contains(result, arr[i])){
-                result.push(arr[i]);
-            }
-        }
-        return result;
-    };
-    
-    /**
-     * 把伪数组转换成速组, 如 NodeList , Arguments等有下标和length的对象
-     * @param  {Object}, {NodeList} obj 
-     * @return {Array}
-     */
-    this.parse = function(obj){
-        return Array.prototype.slice.call(obj);
-    }
-
-});
-
-;Z.$package('Z.browser', function(z){
-    var packageContext = this;
-    
-    (function(){
-        var browser = {};
-        browser.set = function(name, version){
-            this.name = name;
-            this.version = version;
-            this[name] = version;
-        };
-        var s, ua = navigator.userAgent.toLowerCase();
-        (s = ua.match(/msie ([\d.]+)/)) ? browser.set("ie",(s[1])):
-        (s = ua.match(/firefox\/([\d.]+)/)) ? browser.set("firefox",(s[1])) :
-        (s = ua.match(/chrome\/([\d.]+)/)) ? browser.set("chrome",(s[1])) :
-        (s = ua.match(/opera.([\d.]+)/)) ? browser.set("opera",(s[1])) :
-        (s = ua.match(/version\/([\d.]+).*safari/)) ? browser.set("safari",(s[1])) : 0;
-        
-        Z.merge(packageContext, browser);
-        
-    })();
-    
-    var privatePrefixs = {
-        ie: 'Ms',
-        firefox: 'Moz',
-        opera: 'O',
-        chrome: 'Webkit',
-        safari: 'Webkit'
-    };
-    var getPrivatePrefix = function(browserName){
-        return privatePrefixs[browserName || z.browser.name];
-    };
-    
-    var checkerElement;
-    
-    var getCheckerElement = function(){
-        if(!checkerElement){
-            checkerElement = document.createElement('div');
-        }
-        return checkerElement;
-    }
-    
-    /**
-     * 检测 css 的支持
-     * @param {String} property 指定需要检测的属性
-     * @param {String} value 检测是否支持指定值 @optional
-     * @param {Boolean} checkPrivate 指定是否尝试检测浏览器的私有支持 @default false @optional
-     */
-    this.cssSupport = function(property, value, checkPrivate){
-        // throw new Error('not support');
-        var element = getCheckerElement();
-        if(property in element.style){//TODO 不够完善
-            element.style[property] = value;
-            return element.style[property] === value;
-        }else if(checkPrivate){
-            var firstChar = property.charAt(0).toUpperCase();
-            property = getPrivatePrefix() + firstChar + property.substr(1);
-            return cssSupport(property, false, value);
-        }else{
-            return false;
-        }
-    }
-    
-    
-});
-
 ;Z.$package('Z.cookie', function(z){
 
     var defaultDomain = window.location.host;
@@ -1211,6 +1057,212 @@
         }
     }
     
+});
+/**
+ * @namespace Z.message
+ * zTool 使用全局的消息通知机制, 需要监听消息的模块调用addListener注册一个回调函数,
+ * 当有指定消息到达时触发
+ */
+;Z.$package('Z.message', function(z) {
+    var IE_CUSTOM_EVENT = 'onpropertychange';
+    var IE_EVENT_ELEMENT_STYLE = 'position: absolute; top: -9999em; left: -9999em; width: 0px; height: 0px;';
+
+    var eventElement;
+
+    var increaseId = 0;
+
+    var getEventElement = function() {
+        if (!eventElement) {
+            eventElement = document.createElement('div');
+            if (!document.createEvent) {
+                eventElement.style.cssText = IE_EVENT_ELEMENT_STYLE;
+                document.body.appendChild(eventElement);
+            }
+        }
+        return eventElement;
+    }
+
+    var getListenerId = function(){
+        return +new Date + '' + increaseId++ ;
+    }
+
+    /**
+     * 添加事件监听
+     * @param {Object} model 消息的挂载目标, 可选, 默认为 window
+     * @param {String} type 消息类型
+     * @param {Function} func 监听函数
+     * func 的调用参数为 ({String}: type, {Object}: message)
+     */
+    var addListener = function(model, type, func) {
+        var listener;
+        var wrapFunc;
+        var element;
+        var listeners;
+        var listenerId;
+        if(arguments.length < 2){
+            throw new Error('addListener arguments not enough');
+        }else if (arguments.length === 2) {
+            func = type;
+            type = model;
+            model = window;
+        }
+        if (!model.__listeners) {
+            model.__listeners = {};
+            model.__listenerId = getListenerId();
+        }
+        listeners = model.__listeners;
+        listenerId = model.__listenerId;
+        if (!listeners[type]) {
+            listeners[type] = [];
+        } else {
+            for (var i in listeners[type]) {
+                listener = listeners[type][i];
+                if (listener.func === func) {
+                    return false;
+                }
+            }
+        }
+        element = getEventElement();
+        if (element.addEventListener) {
+            wrapFunc = function(e) {
+                func.apply(window, e.params);
+            }
+            element.addEventListener(listenerId + '-' + type, wrapFunc, false);
+        } else {
+            wrapFunc = function(e) {
+                e = window.event;
+                //TODO ie8及以下的浏览器后绑定的方法先执行, 导致触发的事件执行顺序倒过来了
+                //没精力去自己实现顺序执行, 先这样吧
+                var lid = e.params.pop();
+                if (type === e.params[1] && lid === listenerId) {
+                    func.apply(window, e.params);
+                }
+            }
+            element.attachEvent(IE_CUSTOM_EVENT, wrapFunc);
+        }
+        listener = {
+            func: func,
+            wrapFunc: wrapFunc
+        };
+        listeners[type].push(listener);
+        return true;
+    }
+    /**
+     * 移除事件监听
+     * @param {Object} model 消息的挂载目标, 可选, 默认为 window
+     * @param {String} type
+     * @param {Function} func 监听函数
+     */
+    var removeListener = function(model, type, func) {
+        var listener;
+        var element;
+        var listeners;
+        var listenerId;
+        if(arguments.length < 2){
+            throw new Error('removeListener arguments not enough');
+        }else if (arguments.length === 2) {
+            func = type;
+            type = model;
+            model = window;
+        }
+        listeners = model.__listeners;
+        listenerId = model.__listenerId;
+        if (!listeners || !listeners[type]) {
+            return false;
+        }
+        element = getEventElement();
+        // TODO 这个支持有存在的必要吗
+        // if (!func) {
+        //     for (var i in listeners[type]) {
+        //         listener = listeners[type][i];
+        //         if (element.removeEventListener) {
+        //             element.removeEventListener(type, listener.wrapFunc, false);
+        //         } else {
+        //             element.detachEvent(IE_CUSTOM_EVENT, listener.wrapFunc);
+        //         }
+        //     }
+        //     listeners[type] = null;
+        //     delete listeners[type];
+        //     return true;
+        // }
+        for (var i in listeners[type]) {
+            listener = listeners[type][i];
+            if (listener.func === func) {
+                listeners[type].slice(i, 1);
+                if (element.removeEventListener) {
+                    element.removeEventListener(listenerId + '-' + type, listener.wrapFunc, false);
+                } else {
+                    element.detachEvent(IE_CUSTOM_EVENT, listener.wrapFunc);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 
+     * 向消息的监听者广播一条消息
+     * @param {Object} model 消息的挂载目标, 可选, 默认为 window
+     * @param {String} type ,消息类型
+     * @param {Object} message, 消息体, 可选
+     * @example
+     * var func1 = function(type, message){
+            console.log('help!!!!! don\t kill me ..... call 110.');
+            throw '110';
+        }
+        
+        z.message.on('kill', func1);
+        
+        z.message.on('kill', function(type, message){
+            console.log('ok, i m dead.');
+            
+        });
+        
+        //notify it
+        z.message.notify('kill')
+        //or 
+        z.message.notify(window, 'kill')
+     *
+     */
+    var notify = function(model, type, message) {
+        var element;
+        var event;
+        var listeners;
+        var listenerId;
+        if (arguments.length === 1) {
+            type = model;
+            model = window;
+        }else if (arguments.length === 2 && z.isString(model)) {
+            message = type;
+            type = model;
+            model = window;
+        }
+        z.debug('notify message: ' + type);
+        listeners = model.__listeners;
+        listenerId = model.__listenerId;
+        if (!listeners || !listeners[type]) {
+            return false;
+        }
+
+        element = getEventElement();
+        if (document.createEvent) {
+            event = document.createEvent('Events');
+            event.initEvent(listenerId + '-' + type, false, false);
+            event.params = [message, type];
+            element.dispatchEvent(event);
+        } else {
+            event = document.createEventObject(IE_CUSTOM_EVENT);
+            event.params = [message, type, listenerId];
+            element.fireEvent(IE_CUSTOM_EVENT, event);
+        }
+        return listeners[type].length !== 0;
+    }
+
+    this.addListener = addListener;
+    this.on = addListener;
+    this.removeListener = removeListener;
+    this.off = removeListener;
+    this.notify = notify;
 });
 
 ;Z.$package('Z.number', function(z){
@@ -2029,136 +2081,6 @@
 ;Z.$package('Z.util', function(z){
     
     /**
-     * 返回一个方法, 在一段时间内多次调用只执行一次
-     * @param  {Number} time 进行调用限制的时间范围
-     * @param  {Function} func 需要包装的方法
-     * @param  {Boolean} immediate 指示在第一次调用时执行, 还是间隔time毫秒之后执行
-     * @return {Function}
-     * 
-     * @example
-     * 
-function a(){
-    console.log('exec a');
-}
-var b = debounce(1000, a);
-var c = debounce(1000, a, true);
-function testCase1(){
-    var i = 0; 
-    var id = setInterval(function(){
-        if(i++ < 30){
-            console.log('call b' + i);
-            b();
-        }else{
-            clearInterval(id)
-        }
-    },100);
-}
-function testCase2(){
-    var i = 0; 
-    var id = setInterval(function(){
-        if(i++ < 30){
-            console.log('call c' + i);
-            c();
-        }else{
-            clearInterval(id)
-        }
-    },100);
-}
-
-     */
-    this.debounce = function(time, func, immediate){
-        var lastExecTime;
-        return function(){
-            if(!lastExecTime || (+new Date - lastExecTime > time)){
-                immediate ? func() : setTimeout(func, time);
-                lastExecTime = +new Date;
-            }
-        };
-    }
-
-    
-});/**
- * setTimout 的封装, 用于处理输入检测等触发过快的事件/方法
- */
-;Z.$package('Z.util', function(z){
-    
-    var DELAY_STATUS = {
-        NORMAL: 0,
-        ID_EXIST: 1,
-        ID_NOT_EXIST: 2
-    };
-
-    var timerList = {};
-    /**
-     * @param {String} id @optional
-     * @param {Number} time @optional
-     * @param {Function} func
-     * @param {Object} funcContext @optional func的执行上下文, 默认 window
-     * @example
-     * 1. delay('id01', 1000, func)
-     * 2. delay(1000, func)
-     * 3. delay(func) === delay(0, func)
-     * 4. delay('id02', 1000, func, context)
-     * TODO 5. delay({
-     *     id: 'id03',
-     *     time: 1000,
-     *     func: func,
-     *     context: this,
-     *     onClear: func
-     * })
-     */
-    this.delay = function(id, time, func, funcContext){
-        var argu = arguments;
-        var flag = DELAY_STATUS.NORMAL;
-        if(argu.length === 1){
-            func = id;
-            time = 0;
-            id = null;
-        }else if(argu.length === 2){
-            func = time;
-            time = id;
-            id = null;
-        }
-        time = time || 0;
-        if(id && time){
-            if(id in timerList){
-                window.clearTimeout(timerList[id]);
-                flag = DELAY_STATUS.ID_EXIST;
-            }
-            var wrapFunc = function(){
-                timerList[id] = 0;
-                delete timerList[id];
-                func.apply(funcContext || window, [id]);
-            };
-            var timer = window.setTimeout(wrapFunc, time);
-            timerList[id] = timer;
-        }else{
-            if(funcContext){
-                var wrapFunc = function(){
-                    func.apply(funcContext || window);
-                };
-                window.setTimeout(wrapFunc, time);
-            }else{
-                window.setTimeout(func, time);
-            }
-        }
-        return flag;
-    }
-    
-    this.clearDelay = function(id){
-        if(id in timerList){
-            window.clearTimeout(timerList[id]);
-            timerList[id] = 0;
-            delete timerList[id];
-            return DELAY_STATUS.NORMAL;
-        }
-        return DELAY_STATUS.ID_NOT_EXIST;
-    }
-    
-});
-;Z.$package('Z.util', function(z){
-    
-    /**
      * @class
      * 一系列方法的执行依赖队列, 每个方法执行完成之后必须手动调用 next() 方法
      * 整个队列执行完成之后自动执行初始化时传入的 onFinish 方法
@@ -2345,6 +2267,160 @@ function testCase2(){
             this._require(url, param);
         }
     });
+    
+});
+
+;Z.$package('Z.util', function(z){
+    
+    /**
+     * 返回一个方法, 在一段时间内多次调用只执行一次
+     * @param  {Number} time 进行调用限制的时间范围
+     * @param  {Function} func 需要包装的方法
+     * @param  {Boolean} immediate 指示在第一次调用时执行, 还是间隔time毫秒之后执行
+     * @return {Function}
+     * 
+     * @example
+     * 
+function a(){
+    console.log('exec a');
+}
+var b = debounce(1000, a);
+var c = debounce(1000, a, true);
+function testCase1(){
+    var i = 0; 
+    var id = setInterval(function(){
+        if(i++ < 30){
+            console.log('call b' + i);
+            b();
+        }else{
+            clearInterval(id)
+        }
+    },100);
+}
+function testCase2(){
+    var i = 0; 
+    var id = setInterval(function(){
+        if(i++ < 30){
+            console.log('call c' + i);
+            c();
+        }else{
+            clearInterval(id)
+        }
+    },100);
+}
+
+     */
+    this.debounce = function(time, func, immediate){
+        var lastExecTime;
+        return function(){
+            if(!lastExecTime || (+new Date - lastExecTime > time)){
+                immediate ? func() : setTimeout(func, time);
+                lastExecTime = +new Date;
+            }
+        };
+    }
+
+    
+});/**
+ * setTimout 的封装, 用于处理输入检测等触发过快的事件/方法
+ */
+;Z.$package('Z.util', function(z){
+    
+    var DELAY_STATUS = {
+        NORMAL: 0,
+        ID_EXIST: 1,
+        ID_NOT_EXIST: 2
+    };
+
+    var timerList = {};
+    /**
+     * @param {String} id @optional
+     * @param {Number} time @optional
+     * @param {Function} func
+     * @param {Object} funcContext @optional func的执行上下文, 默认 window
+     * @example
+     * 1. delay('id01', 1000, func)
+     * 2. delay(1000, func)
+     * 3. delay(func) === delay(0, func)
+     * 4. delay('id02', 1000, func, context)
+     * TODO 5. delay({
+     *     id: 'id03',
+     *     time: 1000,
+     *     func: func,
+     *     context: this,
+     *     onClear: func
+     * })
+     */
+    this.delay = function(id, time, func, funcContext){
+        var argu = arguments;
+        var flag = DELAY_STATUS.NORMAL;
+        if(argu.length === 1){
+            func = id;
+            time = 0;
+            id = null;
+        }else if(argu.length === 2){
+            func = time;
+            time = id;
+            id = null;
+        }
+        time = time || 0;
+        if(id && time){
+            if(id in timerList){
+                window.clearTimeout(timerList[id]);
+                flag = DELAY_STATUS.ID_EXIST;
+            }
+            var wrapFunc = function(){
+                timerList[id] = 0;
+                delete timerList[id];
+                func.apply(funcContext || window, [id]);
+            };
+            var timer = window.setTimeout(wrapFunc, time);
+            timerList[id] = timer;
+        }else{
+            if(funcContext){
+                var wrapFunc = function(){
+                    func.apply(funcContext || window);
+                };
+                window.setTimeout(wrapFunc, time);
+            }else{
+                window.setTimeout(func, time);
+            }
+        }
+        return flag;
+    }
+    
+    this.clearDelay = function(id){
+        if(id in timerList){
+            window.clearTimeout(timerList[id]);
+            timerList[id] = 0;
+            delete timerList[id];
+            return DELAY_STATUS.NORMAL;
+        }
+        return DELAY_STATUS.ID_NOT_EXIST;
+    }
+    
+});
+;Z.$package('Z.util', function(z){
+    
+    /**
+     * 计算对象的属性数量
+     * @param  {Object} obj 
+     * @return {Number}
+     */
+    this.sizeof = function(obj){
+        if(z.isArray(obj)){
+            return obj.length;
+        }else{
+            var n, count = 0;  
+            for(n in obj){  
+                if(obj.hasOwnProperty(n)){  
+                    count++;  
+                }  
+            }  
+            return count;  
+        }
+    };
+
     
 });
 /**

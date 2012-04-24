@@ -1,6 +1,9 @@
 
 ;Z.$package('Z.util', function(z){
     
+    //防止 hasOwnProperty 被污染
+    var hasOwnProperty = Object.prototype.hasOwnProperty;
+
     /**
      * 计算对象的属性数量
      * @param  {Object} obj 
@@ -12,7 +15,7 @@
         }else{
             var n, count = 0;  
             for(n in obj){  
-                if(obj.hasOwnProperty(n)){  
+                if(hasOwnProperty.call(obj, n)){  
                     count++;  
                 }  
             }  

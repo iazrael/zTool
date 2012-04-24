@@ -15,33 +15,10 @@
     <target name="concat" depends="init">
         <concat destfile="${build}/ztool.all.uncompressed.js" encoding="${charset}" outputencoding="${charset}">
             <path path="${src}/z.core.js" />
-            <path path="${src}/z.base.js" />
-            <path path="${src}/z.class.js" />
-            <path path="${src}/z.message.js" />
-
-            <path path="${src}/z.array.js" />
-            <path path="${src}/z.browser.js" />
-            <path path="${src}/z.cookie.js" />
-            <path path="${src}/z.date.js" />
-
-            <path path="${src}/z.dom.ellipsis.js" />
-            <path path="${src}/z.dom.js" />
-
-            <path path="${src}/z.number.js" />
-            <path path="${src}/z.storage.js" />
-            <path path="${src}/z.string.js" />
-
-            <path path="${src}/z.ui.ScrollAction.js" />
-
-            <path path="${src}/z.util.Beater.js" />
-            <path path="${src}/z.util.Collection.js" />
-            <path path="${src}/z.util.debounce.js" />
-            <path path="${src}/z.util.delay.js" />
-            <path path="${src}/z.util.DependentQueue.js" />
-            <path path="${src}/z.util.HttpRequest.js" />
-            <path path="${src}/z.util.loop.js" />
-            <path path="${src}/z.util.timetaken.js" />
-        
+            <fileset dir="${src}/">
+                <include name="*.js" />
+                <exclude name="z.core.js" />
+            </fileset>
         </concat>
 
         <concat destfile="${build}/ztool.mini.uncompressed.js" encoding="${charset}" outputencoding="${charset}">

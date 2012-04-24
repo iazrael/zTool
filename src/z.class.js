@@ -33,7 +33,7 @@
            prototype.init = emptyFunction;
         }
         var newClass = function(){
-            z.debug( 'class [' + newClass.className + '] init');
+            // z.debug( 'class [' + newClass.className + '] init');
             return this.init.apply(this, arguments);
         };
         var superClass = option.extend;
@@ -202,6 +202,7 @@
         
     }
     
+    this.define = define;
     this.$class = defineClass;
     this.$interface = defineInterface;
     

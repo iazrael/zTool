@@ -186,7 +186,6 @@
      * init the library
      */
     $package(LIBRARY_NAME, function(z){
-        z.debug = debug;
         
         z.PACKAGE_STATUS = PACKAGE_STATUS;
         z.$package = $package;
@@ -200,6 +199,18 @@
  */
 ;Z.$package('Z', function(z){
     
+    /**
+     * 简易的 debug 方法, 没有 console 则不起任何作用
+     * @param  {Object} data 
+     */
+    this.debug = function(data){
+        if(window.console){
+            console.debug ? console.debug(data) : console.log(data);
+        }else{
+            //alert(data);
+        }
+    };
+
     var toString = Object.prototype.toString;
     
     this.isString = function(obj){
@@ -226,11 +237,23 @@
         return toString.call(obj) === '[object Undefined]';
     }
     
-    
-});
-;Z.$package('Z', function(z){
-    
-    var emptyFunction = function(){};
+    /**
+     * 判断对象或数组是否为空, 如{},[]责返回false
+     * @param  {Object} 
+     * @return {Boolean}
+     */
+    this.isEmpty = function(obj){
+        if(!obj){
+            return false;
+        }else if(this.isArray(obj)){
+            return !!obj.length;
+        }else{
+            for(var i in obj){  
+                return false;
+            }
+            return true;
+        }
+    }
 
     /**
      * 合并几个对象并返回 baseObj,
@@ -286,6 +309,36 @@
     }
 
     /**
+     * 使子类简单继承父类, 仅仅将父类的静态属性方法和实例属性方法拷贝给子类
+     * @param  {Function} child  子类
+     * @param  {Function} parent 父类
+     * @return {Function} child 
+     * @example
+     * function parent(){
+     * }
+     * parent.prototype {};
+     * function child(){
+     * }
+     * child.prototype = {};
+     * extend(child, parent);
+     */
+    var extend = function(child, parent){
+        //继承 parent 的静态方法
+        merge(child, parent);
+        //继承 parent 的 prototype
+        child.prototype = merge({}, parent.prototype, child.prototype);
+    }
+
+    this.merge = merge;
+    this.duplicate = duplicate;
+    this.extend = extend;
+    
+});
+;Z.$package('Z', function(z){
+    
+    var emptyFunction = function(){};
+
+    /**
      * @ignore
      */
     var _classToString = function(){
@@ -315,7 +368,7 @@
            prototype.init = emptyFunction;
         }
         var newClass = function(){
-            z.debug( 'class [' + newClass.className + '] init');
+            // z.debug( 'class [' + newClass.className + '] init');
             return this.init.apply(this, arguments);
         };
         var superClass = option.extend;
@@ -325,19 +378,21 @@
             }
             var superInit = superClass.prototype.init;
             var thisInit = prototype.init;//释放传入 prototype 变量的引用, 以便内存回收
-            var superPrototype = duplicate(superClass.prototype);
+            var superPrototype = z.duplicate(superClass.prototype);
             delete superPrototype.init;
-            newClass.prototype = merge({}, superClass.prototype, prototype);
+            newClass.prototype = z.merge({}, superClass.prototype, prototype);
             var newPrototype = prototype;
             newClass.prototype.init = function(){
-                var argus = duplicate(arguments);
+                var argus = z.duplicate(arguments);
                 superInit.apply(this, argus);
                 this.$static = newClass;//提供更快速的访问类方法的途径
-                argus = duplicate(arguments);
+                argus = z.duplicate(arguments);
                 thisInit.apply(this, argus);
                 //把父类被重写的方法赋给子类实例
                 var that = this;
                 this.$super = {};//TODO 这里有问题, 不能向上找父类的父类
+                //TODO 严重问题, A <- B <- C
+                //b调用了$super, c调用了$super的时候有死循环
                 for(var prop in superPrototype){
                     if(z.isFunction(superPrototype[prop]) && newPrototype[prop]){//子类重写了的方法, 才覆盖
                         this.$super[prop] = (function(prop){
@@ -373,7 +428,7 @@
             }
         }
         if(option.statics){
-            merge(newClass, option.statics);
+            z.merge(newClass, option.statics);
         }
         return newClass;
     }
@@ -482,10 +537,7 @@
         
     }
     
-    this.merge = merge;
-    this.duplicate = duplicate;
     this.define = define;
-    
     this.$class = defineClass;
     this.$interface = defineInterface;
     
