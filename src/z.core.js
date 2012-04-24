@@ -186,7 +186,6 @@
      * init the library
      */
     $package(LIBRARY_NAME, function(z){
-        z.debug = debug;
         
         z.PACKAGE_STATUS = PACKAGE_STATUS;
         z.$package = $package;

@@ -4,59 +4,6 @@
     var emptyFunction = function(){};
 
     /**
-     * 合并几个对象并返回 baseObj,
-     * 如果 extendObj 有数组属性, 则直接拷贝引用
-     * @param {Object} baseObj 基础对象
-     * @param {Object} extendObj ... 
-     * 
-     * @return {Object} baseObj
-     * 
-     **/
-    var merge = function(baseObj, extendObj1, extendObj2/*, extnedObj3...*/){
-        var argu = arguments;
-        var extendObj;
-        for(var i = 1; i < argu.length; i++){
-            extendObj = argu[i];
-            for(var j in extendObj){
-                if(z.isArray(extendObj[j])){
-                    baseObj[j] = extendObj[j].concat();
-                }else if(z.isObject(extendObj[j])){
-                    if(baseObj[j] && z.isArray(baseObj[j])){
-                    //避免给数组做 merge
-                        baseObj[j] = merge({}, extendObj[j]);
-                    }else{
-                        baseObj[j] = merge({}, baseObj[j], extendObj[j]);
-                    }
-                }else{
-                    baseObj[j] = extendObj[j];
-                }
-            }
-        }
-        return baseObj;
-    }
-    
-    /**
-     * 把传入的对象或数组或者参数对象(arguments)复制一份
-     * @param {Object}, {Array}
-     * @return {Object}, {Array} 一个新的对象或数组
-     */
-    var duplicate = function(obj){
-        if(z.isArray(obj)){
-            return obj.concat();
-        }else if(z.isArguments(obj)){
-            var result = [];
-            for(var a = 0, p; p = obj[a]; a++){
-                result.push(duplicate(p));
-            }
-            return result;
-        }else if(z.isObject(obj)){
-            return merge({}, obj);
-        }else{
-            throw new Error('the argument isn\'t an object or array');
-        }
-    }
-
-    /**
      * @ignore
      */
     var _classToString = function(){
@@ -96,15 +43,15 @@
             }
             var superInit = superClass.prototype.init;
             var thisInit = prototype.init;//释放传入 prototype 变量的引用, 以便内存回收
-            var superPrototype = duplicate(superClass.prototype);
+            var superPrototype = z.duplicate(superClass.prototype);
             delete superPrototype.init;
-            newClass.prototype = merge({}, superClass.prototype, prototype);
+            newClass.prototype = z.merge({}, superClass.prototype, prototype);
             var newPrototype = prototype;
             newClass.prototype.init = function(){
-                var argus = duplicate(arguments);
+                var argus = z.duplicate(arguments);
                 superInit.apply(this, argus);
                 this.$static = newClass;//提供更快速的访问类方法的途径
-                argus = duplicate(arguments);
+                argus = z.duplicate(arguments);
                 thisInit.apply(this, argus);
                 //把父类被重写的方法赋给子类实例
                 var that = this;
@@ -146,7 +93,7 @@
             }
         }
         if(option.statics){
-            merge(newClass, option.statics);
+            z.merge(newClass, option.statics);
         }
         return newClass;
     }
@@ -254,10 +201,6 @@
         }
         
     }
-    
-    this.merge = merge;
-    this.duplicate = duplicate;
-    this.define = define;
     
     this.$class = defineClass;
     this.$interface = defineInterface;

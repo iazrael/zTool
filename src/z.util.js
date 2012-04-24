@@ -2,30 +2,23 @@
 ;Z.$package('Z.util', function(z){
     
     /**
-     * 计算 object 的长度
-     * @param  {Object} o 
+     * 计算对象的属性数量
+     * @param  {Object} obj 
      * @return {Number}
      */
-    this.size = function(o){  
-        var n, count = 0;  
-        for(n in o){  
-            if(o.hasOwnProperty(n)){  
-                count++;  
+    this.sizeof = function(obj){
+        if(z.isArray(obj)){
+            return obj.length;
+        }else{
+            var n, count = 0;  
+            for(n in obj){  
+                if(obj.hasOwnProperty(n)){  
+                    count++;  
+                }  
             }  
-        }  
-        return count;  
+            return count;  
+        }
     };
 
-    /**
-     * 判断是否为空对象
-     * @param  {Object} 
-     * @return {Boolean}
-     */
-    this.isEmptyObject = function(o){
-        for(var n in o){  
-            return false;
-        }  
-        return true;
-    };
     
 });
