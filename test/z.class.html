@@ -11,7 +11,9 @@
 <script>
 Z.$package(function(z){
 A = z.$class({
-    init: function(){
+    init: function(opt){
+		console.log(opt.a);
+		opt.a = 'xxxx';
         console.log('a init');
     },
     ha: function() {
@@ -21,7 +23,8 @@ A = z.$class({
 B = z.$class({
     extend: A
 }, {
-    init: function(){
+    init: function(opt){
+		console.log(opt.a);
         console.log('b init');
     },
     ha: function() {

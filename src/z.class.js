@@ -63,8 +63,7 @@
                 var argus = z.duplicate(arguments);
                 superInit.apply(this, argus);
                 this.$static = newClass;//提供更快速的访问类方法的途径
-                argus = z.duplicate(arguments);
-                thisInit.apply(this, argus);
+                thisInit.apply(this, arguments);
             }
         }else{
             var thisInit = prototype.init;
