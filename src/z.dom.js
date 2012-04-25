@@ -10,6 +10,25 @@
     this.get = function(id){
         return document.getElementById(id);
     }
+
+    /**
+     * 简单的查找封装, 只支持一个选择符, 性能不高, 需要高性能的请使用jquery
+     * 改方法只是提供用于 简单页面, 不需要jquery的场景使用
+     * @param  {String} selector 选择器, 如 #id, .class, tag
+     * @return {NodeList}, {Node}
+     */
+    this.query = function(selector, parentNode){
+        parentNode = parentNode || document;
+        var s = selector.charAt(0);
+        var v = selector.substring(1);
+        if(s === '#'){
+            return this.get(v);
+        }else if(s === '.'){
+            return parentNode.querySelectorAll(selector);
+        }else{
+            return parentNode.getElementsByTagName(selector);
+        }
+    }
     
     var templateList = {};
     
