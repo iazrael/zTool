@@ -298,6 +298,11 @@
     };
 
     var toString = Object.prototype.toString;
+
+    this.is = function(type, obj) {
+        var clas = toString.call(obj).slice(8, -1);
+        return obj !== undefined && obj !== null && clas === type;
+    }
     
     this.isString = function(obj){
         return toString.call(obj) === '[object String]';
@@ -540,17 +545,25 @@
                 argus = z.duplicate(arguments);
                 thisInit.apply(this, argus);
                 //把父类被重写的方法赋给子类实例
-                var that = this;
                 this.$super = {};//TODO 这里有问题, 不能向上找父类的父类
                 //TODO 严重问题, A <- B <- C
                 //b调用了$super, c调用了$super的时候有死循环
                 for(var prop in superPrototype){
                     if(z.isFunction(superPrototype[prop]) && newPrototype[prop]){//子类重写了的方法, 才覆盖
-                        this.$super[prop] = (function(prop){
+                        newPrototype[prop] = (function(superFn, subFn){
                             return function(){
-                                superPrototype[prop].apply(that, arguments);
+                                var tmp = this.$super;
+                                this.$super = superFn;
+                                subFn.apply(this, arguments);
+                                this.$super = tmp;
                             }
-                        })(prop);
+                        })(superPrototype[prop], newPrototype[prop]);
+
+                        // this.$super[prop] = (function(prop, fn){
+                        //     return function(){
+                        //         fn.apply(that, arguments);
+                        //     }
+                        // })(prop, superPrototype[prop]);
                     }
                 }
             }
@@ -2402,6 +2415,9 @@ function testCase2(){
 });
 ;Z.$package('Z.util', function(z){
     
+    //防止 hasOwnProperty 被污染
+    var hasOwnProperty = Object.prototype.hasOwnProperty;
+
     /**
      * 计算对象的属性数量
      * @param  {Object} obj 
@@ -2413,7 +2429,7 @@ function testCase2(){
         }else{
             var n, count = 0;  
             for(n in obj){  
-                if(obj.hasOwnProperty(n)){  
+                if(hasOwnProperty.call(obj, n)){  
                     count++;  
                 }  
             }  

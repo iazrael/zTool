@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Test</title>
+</head>
+<body>
+<script src="../src/z.core.js"></script>
+<script src="../src/z.base.js"></script>
+<script src="../src/z.class.js"></script>
+<script>
+Z.$package('Z.test', function(z){
+A = z.$class({
+    init: function(){
+        console.log('a init');
+    },
+    ha: function() {
+        console.log('a')
+    }
+});
+B = z.$class({
+    extend: A
+}, {
+    init: function(){
+        console.log('b init');
+    },
+    ha: function() {
+        this.$super();
+        console.log('b')
+    },
+    hb: function(){
+        console.log('hb');
+    }
+});
+C = z.$class({
+    extend: B
+}, {
+    init: function(){
+        console.log('c init');
+    },
+    ha: function() {
+        this.$super();
+        console.log('c')
+    },
+    hc: function() {}
+});
+
+D = z.$class({
+    extend: A
+}, {
+    init: function(){
+        console.log('d init');
+    },
+    ha: function() {
+        this.$super();
+        console.log('d')
+    },
+    hd: function(){
+        console.log('hd');
+    }
+});
+
+
+
+});
+
+
+</script>
