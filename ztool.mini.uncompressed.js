@@ -14,11 +14,15 @@
     var emptyFunction = function(){};
     
     var isDebuging = 0;
-    
     var debug = isDebuging ? (window.console ? function(data){
         console.debug ? console.debug(data) : console.log(data);
     } : emptyFunction) : emptyFunction;
-       
+    
+    var anonymousCount = 0;
+    var getAnonymousPackageName = function(){
+        return LIBRARY_NAME + '.' + 'anonymous' + '.' + anonymousCount++;
+    }
+
     /**
      * @param {String} packageName
      */
@@ -168,8 +172,11 @@
         if(arguments.length === 3){
             requirePackages = arguments[1];
             constructor = arguments[2];
-        }else{
+        }else if(arguments.length === 2){
             constructor = arguments[1];
+        }else{
+            packageName = getAnonymousPackageName();
+            constructor = arguments[0];
         }
         var pack = buildPackage(packageName);
         if(pack.packageStatus === PACKAGE_STATUS.BUILDED){
@@ -332,6 +339,7 @@
         merge(child, parent);
         //继承 parent 的 prototype
         child.prototype = merge({}, parent.prototype, child.prototype);
+        child.prototype.constructor = child;
     }
 
     this.merge = merge;
@@ -403,8 +411,7 @@
                 var argus = z.duplicate(arguments);
                 superInit.apply(this, argus);
                 this.$static = newClass;//提供更快速的访问类方法的途径
-                argus = z.duplicate(arguments);
-                thisInit.apply(this, argus);
+                thisInit.apply(this, arguments);
             }
         }else{
             var thisInit = prototype.init;

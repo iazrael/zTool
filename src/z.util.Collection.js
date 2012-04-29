@@ -229,6 +229,11 @@
             }
             return false;
         },
+        /**
+         * 批量更新
+         * @param  {Array} items 
+         * @return {Object}, {Boolean}       
+         */
         updateRange: function(items){
             var updatedItems = [], newItem;
             for(var i in items){
@@ -271,9 +276,10 @@
          * @param  {Function} callback callback(item, index)
          * 
          */
-        each: function(callback){
+        each: function(callback, context){
+            context = context || this;
             for(var i = 0, item; item = this._arr[i]; i ++){
-                callback(item, i);
+                callback.call(context, item, i);
             }
         },
         /**

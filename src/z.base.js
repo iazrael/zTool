@@ -136,6 +136,7 @@
         merge(child, parent);
         //继承 parent 的 prototype
         child.prototype = merge({}, parent.prototype, child.prototype);
+        child.prototype.constructor = child;
     }
 
     this.merge = merge;
