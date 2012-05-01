@@ -10,6 +10,8 @@
         return this.className;
     }
 
+    var SUPER_FUNC_REGEX = /this.\$super/;
+
     /**
      * 定义类
      * @param {Object} option , 可指定 extend 和 implements, statics
@@ -47,8 +49,12 @@
             delete superPrototype.init;
             var newPrototype = newClass.prototype = z.merge({}, superClass.prototype, prototype);
             //处理被重写的方法, 提供在子类调用 this.$super(); 的方式调用
+            var subFunc, superFunc;
             for(var prop in superPrototype){
-                if(z.isFunction(superPrototype[prop]) && z.isFunction(newPrototype[prop])){
+                subFunc = newPrototype[prop];
+                superFunc = superPrototype[prop];
+                if(z.isFunction(superFunc) && z.isFunction(subFunc) && 
+                    SUPER_FUNC_REGEX.test(subFunc)){
                     newPrototype[prop] = (function(superFn, subFn){
                         return function(){
                             var tmp = this.$super;
@@ -56,7 +62,7 @@
                             subFn.apply(this, arguments);
                             this.$super = tmp;
                         }
-                    })(superPrototype[prop], newPrototype[prop]);
+                    })(superFunc, subFunc);
                 }
             }
             newClass.prototype.init = function(){
