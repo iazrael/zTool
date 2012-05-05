@@ -96,13 +96,13 @@
     }
 
     /**
-     * 返回指定范围的随机整数, 如 (9, 15], 将返回 9 < n <= 15, 不包括 9 本身
-     * @param  {Number} start 随机数下限, 不包括下限
-     * @param  {Number} end   随机数上限, 包括上限
+     * 返回指定范围的随机整数, 如 [9, 15], 将返回 9 <= n <= 15
+     * @param  {Number} start 随机数最小值
+     * @param  {Number} end   随机数最大值
      * @return {Number}
      */
     this.random = function(start, end){
-        return Math.ceil(Math.random()*(end - start) + start);
+        return Math.floor(Math.random() * (end - start + 1) + start);
     }
     
 });
