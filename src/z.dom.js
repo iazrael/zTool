@@ -94,7 +94,7 @@
         if(!z.isUndefined(position) && target.childElementCount){
             var tempNode = document.createElement('div');
             tempNode.innerHTML = html;
-            var nodes = tempNode.children;
+            var nodes = tempNode.childNodes; //include text node
             var fragment = document.createDocumentFragment();
             while(nodes[0]){
                 fragment.appendChild(nodes[0]);

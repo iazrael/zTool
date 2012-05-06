@@ -65,6 +65,24 @@
     }
 
     /**
+     * 比较两个对象的内容是否是一样的, 只要 obj 有的属性, relatedObj 都有且完全相等, 则返回 true
+     * 
+     * @param  {Object}  obj         
+     * @param  {Object}  relatedObj 被比较的对象
+     * @return {Boolean} 
+     * @example
+     * isSameObject({a: '1', b: 2}, {a: '1', b: 2, c: 'abc'}) === true;
+     */
+    this.isSameObject = function(obj, relatedObj){
+        for(var i in obj){
+            if(obj.hasOwnProperty(i) && obj[i] !== relatedObj[i]){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * 合并几个对象并返回 baseObj,
      * 如果 extendObj 有数组属性, 则直接拷贝引用
      * @param {Object} baseObj 基础对象
