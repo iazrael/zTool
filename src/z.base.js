@@ -69,14 +69,24 @@
      * 
      * @param  {Object}  obj         
      * @param  {Object}  relatedObj 被比较的对象
+     * @param {Boolean} isDeep 是否递归比较, 对于属性有 object 的时候, 需要递归比较
      * @return {Boolean} 
      * @example
      * isSameObject({a: '1', b: 2}, {a: '1', b: 2, c: 'abc'}) === true;
      */
-    this.isSameObject = function(obj, relatedObj){
+    var isSameObject = this.isSameObject = function(obj, relatedObj, isDeep){
+        if(obj === relatedObj || (!obj && !relatedObj)){
+            return true;
+        }
         for(var i in obj){
-            if(obj.hasOwnProperty(i) && obj[i] !== relatedObj[i]){
-                return false;
+            if(obj.hasOwnProperty(i)){
+                if(z.isObject(obj[i]) && z.isObject(relatedObj[i]) && isDeep){
+                    if(!isSameObject(obj[i], relatedObj[i], isDeep)){
+                        return false;
+                    }
+                }else if(obj[i] !== relatedObj[i]){
+                    return false;
+                }
             }
         }
         return true;
