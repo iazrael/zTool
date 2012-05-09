@@ -14,7 +14,7 @@
             height: this.height
         };
         for(var i = 0, cbObj; cbObj = imgObj.cbs[i]; i++){
-            cbObj.cb.call(cbObj.context || window, true, imgObj.url, imgObj.size);
+            cbObj.cb.call(cbObj.cxt || window, true, imgObj.url, imgObj.size);
         }
         imgObj.cbs = [];
     }
@@ -23,7 +23,7 @@
         var imgObj = loader._imageList[this.src];
         imgObj.status = IMAGE_LOAD_ERROR;
         for(var i = 0, cbObj; cbObj = imgObj.cbs[i]; i++){
-            cbObj.cb.call(cbObj.context || window, false, imgObj.url);
+            cbObj.cb.call(cbObj.cxt || window, false, imgObj.url);
         }
         imgObj.cbs = [];
     }

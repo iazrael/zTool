@@ -139,7 +139,7 @@
         }
         targetElement.__commends = commends;
         targetElement.addEventListener(eventName, function(e){
-            var target = packageContext.getActionTarget(e, 3, 'cmd', this);
+            var target = packageContext.getActionTarget(e, -1, 'cmd', this);
             if(target){
                 var cmd = target.getAttribute('cmd');
                 var param = target.getAttribute('param');
