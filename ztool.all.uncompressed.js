@@ -354,6 +354,34 @@
     }
 
     /**
+     * 比较两个对象的内容是否是一样的, 只要 obj 有的属性, relatedObj 都有且完全相等, 则返回 true
+     * 
+     * @param  {Object}  obj         
+     * @param  {Object}  relatedObj 被比较的对象
+     * @param {Boolean} isDeep 是否递归比较, 对于属性有 object 的时候, 需要递归比较
+     * @return {Boolean} 
+     * @example
+     * isSameObject({a: '1', b: 2}, {a: '1', b: 2, c: 'abc'}) === true;
+     */
+    var isSameObject = this.isSameObject = function(obj, relatedObj, isDeep){
+        if(obj === relatedObj || (!obj && !relatedObj)){
+            return true;
+        }
+        for(var i in obj){
+            if(obj.hasOwnProperty(i)){
+                if(z.isObject(obj[i]) && z.isObject(relatedObj[i]) && isDeep){
+                    if(!isSameObject(obj[i], relatedObj[i], isDeep)){
+                        return false;
+                    }
+                }else if(obj[i] !== relatedObj[i]){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
      * 合并几个对象并返回 baseObj,
      * 如果 extendObj 有数组属性, 则直接拷贝引用
      * @param {Object} baseObj 基础对象
@@ -946,7 +974,7 @@
         if(!z.isUndefined(position) && target.childElementCount){
             var tempNode = document.createElement('div');
             tempNode.innerHTML = html;
-            var nodes = tempNode.children;
+            var nodes = tempNode.childNodes; //include text node
             var fragment = document.createDocumentFragment();
             while(nodes[0]){
                 fragment.appendChild(nodes[0]);
@@ -1028,9 +1056,108 @@
             }
         }
     }
+
+    /**
+     * 批量设置样式
+     * @param {HTMLElement} el element
+     * @param  {Object} styles 样式的 key-value 对象
+     */
+    this.css = function(el, styles){
+        for(var i in styles){
+            el.style[i] = styles[i];
+        }
+    }
     
 });
-/**
+
+;Z.$package('Z.file', function(z){
+
+    var IMAGE_NOT_LOAD = 0;
+    var IMAGE_LOADING = 1;
+    var IMAGE_LOADED = 2;
+    var IMAGE_LOAD_ERROR = 3;
+
+    function onImageLoad(e, loader){
+        var imgObj = loader._imageList[this.src];
+        imgObj.status = IMAGE_LOADED;
+        imgObj.size = {
+            width: this.width,
+            height: this.height
+        };
+        for(var i = 0, cbObj; cbObj = imgObj.cbs[i]; i++){
+            cbObj.cb.call(cbObj.context || window, true, imgObj.url, imgObj.size);
+        }
+        imgObj.cbs = [];
+    }
+
+    function onImageError(e, loader){
+        var imgObj = loader._imageList[this.src];
+        imgObj.status = IMAGE_LOAD_ERROR;
+        for(var i = 0, cbObj; cbObj = imgObj.cbs[i]; i++){
+            cbObj.cb.call(cbObj.context || window, false, imgObj.url);
+        }
+        imgObj.cbs = [];
+    }
+
+    /**
+     * 图片的加载类, 这是一个内部类, 对外使用 z.file.loadImage 加载图片
+     * @class
+     * @name ImageLoader
+     */
+    this.ImageLoader = z.$class({
+        init: function(option){
+            this._imageList = {};
+        },
+        /**
+         * 加载图片
+         * @param  {String}   imgUrl   图片url
+         * @param  {Function} callback 回调函数, 回调参数格式为 callback(success, imageUrl, imageSize)
+         * @param  {Object}   context  回调函数的上下文, 可选 
+         * @example
+         * loader.load('http://xxxx', function(success, imgUrl, size){
+         *     if(success){
+         *         console.log('img size is: w= ' + size.width + ', h= ' + size.height);
+         *     }else{
+         *         console.log('load img failure');
+         *     }
+         * }, this);
+         * 
+         */
+        load: function(imgUrl, callback, context){
+            var imgObj = this._imageList[imgUrl];
+            if(!imgObj){
+                imgObj = {
+                    url: imgUrl,
+                    status: IMAGE_NOT_LOAD,
+                    cbs: []
+                };
+                this._imageList[imgUrl] = imgObj;
+            }
+            //已经加载过或正在加载
+            if(imgObj.status === IMAGE_LOADED){
+                callback.call(context || window, true, imgUrl, imgObj.size);
+            }else if(imgObj.status === IMAGE_LOADING){
+                imgObj.cbs.push({ cb: callback, cxt: context });
+            }else{
+                imgObj.cbs.push({ cb: callback, cxt: context });
+                imgObj.status = IMAGE_LOADING;
+                
+                var image = new Image();
+                var that = this;
+                image.onload = function(e){
+                    onImageLoad.call(this, e, that);
+                };
+                var onErrorFunc = function(e){
+                    onImageError.call(this, e, that);
+                };
+                image.onerror = onErrorFunc
+                image.onabort = onErrorFunc;
+                image.src = imgUrl;
+            }
+        }
+    });
+    
+});/**
  * @namespace Z.message
  * zTool 使用全局的消息通知机制, 需要监听消息的模块调用addListener注册一个回调函数,
  * 当有指定消息到达时触发
@@ -1334,13 +1461,13 @@
     }
 
     /**
-     * 返回指定范围的随机整数, 如 (9, 15], 将返回 9 < n <= 15, 不包括 9 本身
-     * @param  {Number} start 随机数下限, 不包括下限
-     * @param  {Number} end   随机数上限, 包括上限
+     * 返回指定范围的随机整数, 如 [9, 15], 将返回 9 <= n <= 15
+     * @param  {Number} start 随机数最小值
+     * @param  {Number} end   随机数最大值
      * @return {Number}
      */
     this.random = function(start, end){
-        return Math.ceil(Math.random()*(end - start) + start);
+        return Math.floor(Math.random() * (end - start + 1) + start);
     }
     
 });
@@ -1511,6 +1638,35 @@
     }
 });
 
+;Z.$package('Z.ui', function(z){
+
+    /**
+     * 图片查看器 
+     * @class
+     * @name ImageViewer
+     * 
+     */
+    this.ImageViewer  = z.$class({
+        init: function(option){
+            var el;
+            if(option.element){
+                el = this._el = option.element;
+            }else{
+                el = this._el = document.createElement('div');
+                el.setAttribute('class', 'image-viewer');
+                (option.parent || document.body).appendChild(el);
+            }
+            
+        },
+        show: function(imgUrl){
+
+        },
+        hide: function(){
+            
+        }
+    });
+    
+});
 ;Z.$package('Z.ui', ['Z.util'], function(z){
 
     /**

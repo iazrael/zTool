@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>z.extend Test</title>
+</head>
+<body>
+<script src="../src/z.core.js"></script>
+<script src="../src/z.base.js"></script>
+<script>
+Z.$package(function(z){
+
+function Base(){
+    console.log('base');
+}
+Base.prototype.alert = function(){
+    console.log('alert');
+}
+function ExBase(){
+    console.log('ex base');
+}
+
+z.extend(ExBase, Base);
+
+var b = new Base();
+console.log('b instanceof Base', b instanceof Base);
+var ex = new ExBase();
+console.log('ex instanceof ExBase', ex instanceof ExBase);
+console.log('ex instanceof Base', ex instanceof Base);
+ex.alert();
+
+});
+
+
+</script>

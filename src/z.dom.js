@@ -99,7 +99,7 @@
             while(nodes[0]){
                 fragment.appendChild(nodes[0]);
             }
-            if(position === -1 || position >= target.childElementCount - 1){
+            if(position === -1 || position >= target.childElementCount){
                 target.appendChild(fragment);
             }else{
                 target.insertBefore(fragment, target.children[position]);
@@ -174,6 +174,17 @@
             }else{
                 return false;
             }
+        }
+    }
+
+    /**
+     * 批量设置样式
+     * @param {HTMLElement} el element
+     * @param  {Object} styles 样式的 key-value 对象
+     */
+    this.css = function(el, styles){
+        for(var i in styles){
+            el.style[i] = styles[i];
         }
     }
     
