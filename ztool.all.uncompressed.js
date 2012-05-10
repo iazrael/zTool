@@ -948,6 +948,9 @@
             s = level !== -1,
             p = property || 'cmd',
             end = parent || document.body;
+        if(t === end){
+            return t.getAttribute(p) ? t : null;
+        }
         while(t && (t !== end) && (s ? (l-- > 0) : true)){
             if(t.getAttribute(p)){
                 return t;
@@ -979,7 +982,7 @@
             while(nodes[0]){
                 fragment.appendChild(nodes[0]);
             }
-            if(position === -1 || position >= target.childElementCount - 1){
+            if(position === -1 || position >= target.childElementCount){
                 target.appendChild(fragment);
             }else{
                 target.insertBefore(fragment, target.children[position]);
@@ -1019,7 +1022,7 @@
         }
         targetElement.__commends = commends;
         targetElement.addEventListener(eventName, function(e){
-            var target = packageContext.getActionTarget(e, 3, 'cmd', this);
+            var target = packageContext.getActionTarget(e, -1, 'cmd', this);
             if(target){
                 var cmd = target.getAttribute('cmd');
                 var param = target.getAttribute('param');
@@ -1085,7 +1088,7 @@
             height: this.height
         };
         for(var i = 0, cbObj; cbObj = imgObj.cbs[i]; i++){
-            cbObj.cb.call(cbObj.context || window, true, imgObj.url, imgObj.size);
+            cbObj.cb.call(cbObj.cxt || window, true, imgObj.url, imgObj.size);
         }
         imgObj.cbs = [];
     }
@@ -1094,7 +1097,7 @@
         var imgObj = loader._imageList[this.src];
         imgObj.status = IMAGE_LOAD_ERROR;
         for(var i = 0, cbObj; cbObj = imgObj.cbs[i]; i++){
-            cbObj.cb.call(cbObj.context || window, false, imgObj.url);
+            cbObj.cb.call(cbObj.cxt || window, false, imgObj.url);
         }
         imgObj.cbs = [];
     }
@@ -1648,6 +1651,7 @@
      */
     this.ImageViewer  = z.$class({
         init: function(option){
+            option = option || {};
             var el;
             if(option.element){
                 el = this._el = option.element;
@@ -1656,13 +1660,73 @@
                 el.setAttribute('class', 'image-viewer');
                 (option.parent || document.body).appendChild(el);
             }
-            
+            el.setAttribute('cmd', 'hide');
+            el.style.display = 'none';
+            this._createDom();
+            this._bindEvents();
+            this._loader = new z.file.ImageLoader();
         },
         show: function(imgUrl){
-
+            this._resize();
+            this._el.style.display = 'block';
+            this._loader.load(imgUrl, this._onImageLoad, this);
         },
         hide: function(){
-            
+            this._el.style.display = 'none';
+        },
+        _createDom: function(){
+            this._el.innerHTML = '\
+            <div class="image-viewer-body" cmd="stopPropagation">\
+                <a class="image-viewer-close" href="javascript:void(0);" title="close" cmd="hide">X</a>\
+                <div class="image-viewer-content">\
+                    <img src="about:blank">\
+                </div>\
+            </div>';
+            this._body = this._el.querySelector('.image-viewer-body');
+            this._image = this._el.querySelector('img');
+        },
+        _bindEvents: function(){
+            var that = this;
+            z.dom.bindCommends(this._el, 'click', {
+                'hide': function(param, target, event){
+                    that.hide();
+                },
+                'stopPropagation': function(param, target, event){
+                    event.stopPropagation();
+                }
+            });
+            var onResize = z.util.debounce(500, function(){
+                that._resize();
+            });
+            window.addEventListener('resize', onResize, false);
+        },
+        _resize: function(){
+            var docEl = document.documentElement;
+            var docWidth = Math.max(docEl.offsetWidth, window.innerWidth);
+            var docHeight = Math.max(docEl.offsetHeight, window.innerHeight);
+            z.dom.css(this._el, {
+                width: docWidth + 'px',
+                height: docHeight + 'px'
+            });
+        },
+        _onImageLoad: function(success, imgUrl, size){
+            if(success){
+                if(size.width > 150){
+                    z.dom.css(this._body, {
+                        width: size.width + 'px',
+                        'margin-left': -size.width / 2 + 'px'
+                    });
+                }
+                if(size.height > 80){
+                    z.dom.css(this._body, {
+                        height: size.height + 'px',
+                        'margin-top': -size.height / 2 + 'px'
+                    });
+                }
+                this._image.src = imgUrl;
+            }else{
+                this._image.src = imgUrl;
+            }
         }
     });
     

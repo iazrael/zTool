@@ -68,6 +68,9 @@
             s = level !== -1,
             p = property || 'cmd',
             end = parent || document.body;
+        if(t === end){
+            return t.getAttribute(p) ? t : null;
+        }
         while(t && (t !== end) && (s ? (l-- > 0) : true)){
             if(t.getAttribute(p)){
                 return t;
