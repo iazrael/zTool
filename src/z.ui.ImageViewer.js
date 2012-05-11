@@ -8,6 +8,13 @@
      * 
      */
     this.ImageViewer  = z.$class({
+        statics: {
+            FIXED_WIDTH: 1,
+            FIXED_HEIGHT: parseInt('10', 2),
+            FIXED_BOTH: parseInt('11', 2),
+            KEEP_BOTH: parseInt('100', 2)
+        }
+    }, {
         init: function(option){
             option = option || {};
             var el;
@@ -20,15 +27,23 @@
             }
             el.setAttribute('cmd', 'hide');
             el.style.display = 'none';
-            this._margin = 10;
-            this._defaultSize = { width: 150, height: 80 };
+            this._margin = option.margin || 10;
+            this._mode = option.mode || this.$static.FIXED_BOTH;
+            this._defaultSize = option.defaultSize || { width: 150, height: 80 };
+            this._imgSize = this._defaultSize;
             this._createDom();
             this._bindEvents();
             this._loader = new z.file.ImageLoader();
+
         },
         show: function(imgUrl){
             this._isShow = true;
             this._resize();
+            // if(this._mode === this.$static.FIXED_BOTH){
+            //     this._body.style.position = 'fixed';
+            // }else{
+            //     this._body.style.position = 'absolute';
+            // }
             this._el.style.display = 'block';
             this._body.classList.add('animation');
             var that = this;
@@ -70,44 +85,98 @@
             this._onResize = z.util.debounce(200, function(){
                 that._resize();
             });
+            var onScroll = function(){
+                that._scroll();
+            }
+            // window.addEventListener('scroll', onScroll, false);
+            var onTransitionEnd = function(){
+                that._resizeMasker();
+            }
+            this._el.addEventListener('webkitTransitionEnd', onTransitionEnd, false);
+
+        },
+        _scroll: function(){
+            if(!this._isShow || !this._rect){
+                return;
+            }
+            var docEl = this._el.parentNode;
+            var docWidth = docEl.offsetWidth, docHeight =docEl.offsetHeight;
+            var scrollTop = docEl.scrollTop, scrollLeft = docEl.scrollLeft;
+            var left = this._rect.left + scrollLeft;
+            var top = this._rect.top +  scrollTop;
+            if(top + this._rect.height > docHeight){
+                top = docHeight - this._rect.height;
+            }
+            if(top < this._margin){
+                top = this._margin;
+            }
+            if(left + this._rect.width > docWidth){
+                left = docWidth - this._rect.width;
+            }
+            if(left < this._margin){
+                left = this._margin;
+            }
+            z.dom.css(this._body, {
+                left: left + 'px',
+                top: top + 'px'
+            });
         },
         _resize: function(){
-            var docEl = document.documentElement;
-            var docWidth = Math.max(docEl.offsetWidth, window.innerWidth);
-            var docHeight = Math.max(docEl.offsetHeight, window.innerHeight);
+            // this._resizeMasker();
+            this._resizeBody();
+        },
+        _resizeMasker: function(){
+            var docEl = this._el.parentNode;
+            var docWidth = Math.max(docEl.offsetWidth, window.innerWidth, docEl.scrollWidth);
+            var docHeight = Math.max(docEl.offsetHeight, window.innerHeight, docEl.scrollHeight);
             z.dom.css(this._el, {
                 width: docWidth + 'px',
                 height: docHeight + 'px'
             });
-            if(this._imgLoad){
-                this._resizeBody();
-            }
         },
         _resizeBody: function(){
             var viewHeight = window.innerHeight, viewWidth = window.innerWidth;
+            var docEl = this._el.parentNode;
+            var scrollTop = docEl.scrollTop, scrollLeft = docEl.scrollLeft;
             var width = this._imgSize.width;
             var height = this._imgSize.height;
             var scale = height / width;
             var newWidth = width, newHeight = height;
-            if(width + 2 * this._margin >= viewWidth){
-                newWidth = viewWidth - 2 * this._margin;
+            if(this._mode & this.$static.FIXED_BOTH){
+                if((this._mode & this.$static.FIXED_WIDTH) && width + 2 * this._margin >= viewWidth){
+                    newWidth = viewWidth - 2 * this._margin;
+                }
+                if((this._mode & this.$static.FIXED_HEIGHT) && height + 2 * this._margin >= viewHeight){
+                    newHeight = viewHeight - 2 * this._margin;
+                }
+
+                height = height / width * newWidth;
+                if(height > newHeight){
+                    height = newHeight;
+                    width = height / scale;
+                }else{
+                    width = newWidth;
+                }
             }
-            if(height + 2 * this._margin >= viewHeight){
-                newHeight = viewHeight - 2 * this._margin;
-            }
-            height = scale * newWidth;
-            if(height > newHeight){
-                height = newHeight;
-                width = height / scale;
-            }else{
-                width = newWidth;
-            }
+            var left = (viewWidth > width + 2 * this._margin) ? (viewWidth - width) / 2 : this._margin;
+            var top = (viewHeight > height + 2 * this._margin) ? (viewHeight - height) / 2 : this._margin;
+            this._rect = {
+                width: width,
+                height: height,
+                left: left,
+                top: top
+            };
+            // left += scrollLeft;
+            // top += scrollTop;
             z.dom.css(this._body, {
                 width: width + 'px',
-                'margin-left': -width / 2 + 'px',
-                height: height + 'px',
-                'margin-top': -height / 2 + 'px'
+                // left: left + 'px',
+                height: height + 'px'
+                // top: top + 'px'
             });
+            this._scroll();
+            //在重新设置一下遮罩的大小
+            this._resizeMasker();
         },
         _onImageLoad: function(success, imgUrl, size){
             if(!this._isShow){
@@ -123,7 +192,6 @@
                 this._imgSize = size;
                 this._image.src = imgUrl;
                 this._image.style.display = 'block';
-                this._imgLoad = true;
                 this._resizeBody();
             }else{
                 this._image.src = imgUrl;
