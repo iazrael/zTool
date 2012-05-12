@@ -363,8 +363,6 @@
      * extend(child, parent);
      */
     var extend = function(child, parent){
-        //继承 parent 的静态方法
-        merge(child, parent);
         //继承 parent 的 prototype
         child.prototype = merge({}, parent.prototype, child.prototype);
         child.prototype.constructor = child;

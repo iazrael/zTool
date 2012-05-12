@@ -34,6 +34,9 @@
             this._createDom();
             this._bindEvents();
             this._loader = new z.file.ImageLoader();
+            this._loading = new z.ui.Loading({
+                element: this._loading
+            });
 
         },
         show: function(imgUrl){
@@ -46,6 +49,7 @@
             // }
             this._el.style.display = 'block';
             this._body.classList.add('animation');
+            this._loading.show();
             var that = this;
             z.util.delay('ImageViewerDelayLoadImage', 500, function(){
                 that._loader.load(imgUrl, that._onImageLoad, that);
@@ -56,9 +60,11 @@
             this._isShow = false;
             this._el.style.display = 'none';
             this._image.src = 'about:blank';
+            this._loading.hide();
             this._image.style.display = 'none';
             this._imgSize = this._defaultSize;
             this._body.classList.remove('animation');
+            this._close.classList.remove('animation');
             window.removeEventListener('resize', this._onResize, false);
         },
         _createDom: function(){
@@ -67,10 +73,13 @@
                 <a class="image-viewer-close" href="javascript:void(0);" title="close" cmd="hide">X</a>\
                 <div class="image-viewer-content">\
                     <img src="about:blank">\
+                    <div class="image-viewer-loading"></div>\
                 </div>\
             </div>';
             this._body = this._el.querySelector('.image-viewer-body');
             this._image = this._el.querySelector('img');
+            this._loading = this._el.querySelector('.image-viewer-loading');
+            this._close = this._el.querySelector('.image-viewer-close');
         },
         _bindEvents: function(){
             var that = this;
@@ -191,8 +200,10 @@
                 }
                 this._imgSize = size;
                 this._image.src = imgUrl;
+                this._loading.hide();
                 this._image.style.display = 'block';
                 this._resizeBody();
+                this._close.classList.add('animation');
             }else{
                 this._image.src = imgUrl;
                 this._image.style.display = 'block';
