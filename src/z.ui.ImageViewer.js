@@ -56,10 +56,13 @@
             });
             window.addEventListener('resize', this._onResize, false);
         },
+        isShow: function(){
+            return this._isShow;
+        },
         hide: function(){
             this._isShow = false;
             this._el.style.display = 'none';
-            this._image.src = 'about:blank';
+            this._image.src = '';
             this._loading.hide();
             this._image.style.display = 'none';
             this._imgSize = this._defaultSize;
@@ -72,7 +75,7 @@
             <div class="image-viewer-body" cmd="stopPropagation">\
                 <a class="image-viewer-close" href="javascript:void(0);" title="close" cmd="hide">X</a>\
                 <div class="image-viewer-content">\
-                    <img src="about:blank">\
+                    <img src="">\
                     <div class="image-viewer-loading"></div>\
                 </div>\
             </div>';
@@ -109,7 +112,8 @@
                 return;
             }
             var docEl = this._el.parentNode;
-            var docWidth = docEl.offsetWidth, docHeight =docEl.offsetHeight;
+            var docWidth = Math.max(docEl.offsetWidth, window.innerWidth, docEl.scrollWidth);
+            var docHeight = Math.max(docEl.offsetHeight, window.innerHeight, docEl.scrollHeight);
             var scrollTop = docEl.scrollTop, scrollLeft = docEl.scrollLeft;
             var left = this._rect.left + scrollLeft;
             var top = this._rect.top +  scrollTop;
@@ -202,6 +206,7 @@
                 this._image.src = imgUrl;
                 this._loading.hide();
                 this._image.style.display = 'block';
+                this._image.classList.add('animation');
                 this._resizeBody();
                 this._close.classList.add('animation');
             }else{

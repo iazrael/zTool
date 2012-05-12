@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="iTally" default="clean" basedir="./">
 	
-	<description>Tally Book II</description>
+	<description>zTool</description>
 	
     <property name="src" location="${basedir}/src"/>
 	<property name="build" location="${basedir}"/>

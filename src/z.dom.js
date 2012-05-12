@@ -3,6 +3,16 @@
     
     var packageContext = this;
 
+
+    this.domReady = function(func){
+        document.addEventListener('DOMContentLoaded', func, false);
+    }
+
+    this.domLoad = function(func){
+        window.addEventListener('load', func, false);
+    }
+    
+
     /**
      * shot of getElementById
      * @param {String} id 
