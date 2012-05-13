@@ -206,7 +206,7 @@
                 this._image.src = imgUrl;
                 this._loading.hide();
                 this._image.style.display = 'block';
-                this._image.classList.add('animation');
+                // this._image.classList.add('animation');
                 this._resizeBody();
                 this._close.classList.add('animation');
             }else{

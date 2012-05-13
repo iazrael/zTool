@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>z.util.timeTaken Test</title>
+</head>
+<body>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+    <div><span></span></div>
+<script src="../src/z.core.js"></script>
+<script src="../src/z.base.js"></script>
+<script src="../src/z.util.timeTaken.js"></script>
+<script>
+Z.$package(function(z){
+
+function bigFor (count,q) {
+    for (var i = 0; i < count; i++) {
+        document.body.querySelectorAll(q);
+    };
+}
+var count = 100000;
+function funcA(){
+    bigFor(count,'.p')
+}
+function funcB (argument) {
+    bigFor(count,'.b')
+}
+function funcDesk (argument) {
+    bigFor(count,'.a')
+}
+function funcMain (argument) {
+    bigFor(count,'.c')
+}
+
+z.util.timeTaken('systemstart', '系统加载');
+funcA();
+funcB();
+z.util.timeTaken('systemstart', '系统加载');
+z.util.timeTaken('drawui', '绘制UI');
+z.util.timeTaken('drawdesk', '绘制桌面');
+funcDesk();
+z.util.timeTaken('drawdesk', '绘制桌面');
+z.util.timeTaken('drawui', '绘制UI', true);
+z.util.timeTaken('drawmain', '绘制主体面板');
+funcMain();
+z.util.timeTaken('drawmain', '绘制主体面板');
+z.util.timeTaken('drawui', '绘制UI');
+
+
+});
+
+
+</script>
