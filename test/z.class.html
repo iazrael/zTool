@@ -11,10 +11,10 @@
 <script>
 Z.$package(function(z){
 A = z.$class({
-    a: {b:3},
     init: function(opt){
-		console.log(opt.a);
-		opt.a = 'xxxx';
+		// console.log(opt.a);
+		// opt.a = 'xxxx';
+        // 
         console.log('a init');
     },
     ha: function() {
@@ -25,7 +25,7 @@ B = z.$class({
     extend: A
 }, {
     init: function(opt){
-		console.log(opt.a);
+		// console.log(opt.a);
         console.log('b init');
     },
     ha: function() {

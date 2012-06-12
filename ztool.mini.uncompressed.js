@@ -344,7 +344,8 @@
         }else if(z.isObject(obj)){
             return merge({}, obj);
         }else{
-            throw new Error('the argument isn\'t an object or array');
+            return obj;
+            // throw new Error('the argument isn\'t an object or array');
         }
     }
 

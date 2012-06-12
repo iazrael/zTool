@@ -430,7 +430,8 @@
         }else if(z.isObject(obj)){
             return merge({}, obj);
         }else{
-            throw new Error('the argument isn\'t an object or array');
+            return obj;
+            // throw new Error('the argument isn\'t an object or array');
         }
     }
 
@@ -2896,6 +2897,31 @@ function testCase2(){
      * @param  {String} msg  要输出的消息, 可选, 不填则输出id
      * @param  {Boolean} keep 是否保留这个第一个点, 可选, 用于打一个点, 多个地方统计使用
      * @return {Number}      第一个点不返回任何内容, 第二个点以后的返回距离第一个点的时间差
+     * @example
+     * z.util.timeTaken('systemstart', '系统加载');
+     * funcA();
+     * funcB();
+     * z.util.timeTaken('systemstart', '系统加载');
+     * z.util.timeTaken('systemstart', '绘制UI');
+     * z.util.timeTaken('systemstart', '绘制桌面');
+     * funcDesk();
+     * z.util.timeTaken('systemstart', '绘制桌面');
+     * z.util.timeTaken('systemstart', '绘制UI', true);
+     * z.util.timeTaken('systemstart', '绘制主体面板');
+     * funcMain();
+     * z.util.timeTaken('systemstart', '绘制主体面板');
+     * z.util.timeTaken('systemstart', '绘制UI');
+     * // 输出: 
+     * //系统加载【start】
+     * //系统加载【end】time taken: 1605
+     * //绘制UI【start】
+     * //绘制桌面【start】
+     * //绘制桌面【end】time taken: 775
+     * //绘制UI【progressing】time taken: 776
+     * //绘制主体面板【start】
+     * //绘制主体面板【end】time taken: 812
+     * //绘制UI【end】time taken: 1588
+     * //
      */
     this.timeTaken = function(id, msg, keep){
         var time = Date.now();
@@ -2912,7 +2938,7 @@ function testCase2(){
                 msg += '【end】';
                 delete pointList[id];
             }
-            msg += 'time taken: ' + time;
+            msg += 'time taken: ' + time + 'ms';
             console.log(msg);
             return time;
         }

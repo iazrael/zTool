@@ -60,7 +60,7 @@
                 msg += '【end】';
                 delete pointList[id];
             }
-            msg += 'time taken: ' + time;
+            msg += 'time taken: ' + time + 'ms';
             console.log(msg);
             return time;
         }
