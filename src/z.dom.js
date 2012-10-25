@@ -129,14 +129,14 @@
      * @param {Object} commends 命令对象
      * 
      * @example
-     * bindCommends(cmds);
-     * bindCommends(el, cmds);
-     * bindCommends(el, 'click', cmds);
+     * bindCommands(cmds);
+     * bindCommands(el, cmds);
+     * bindCommands(el, 'click', cmds);
      * 
      * function(param, target, event){
      * }
      */
-    this.bindCommends = function(targetElement, eventName, commends){
+    this.bindCommands = function(targetElement, eventName, commends){
         var defaultEvent = 'click';
         if(arguments.length === 1){
             commends = targetElement;
@@ -165,6 +165,12 @@
             }
         });
     }
+    /**
+     * 兼容以前的手误…… @2012-7-23
+     * @type {[type]}
+     */
+    this.bindCommends = this.bindCommands;
+
     /**
      * 判断 element 在 reference 中是否可见, reference 必须是 relative 或 absolute  定位, 最好是可滚动的
      * @param  {HTMLElement}  element   
