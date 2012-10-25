@@ -140,15 +140,16 @@
         },
         _resizeMasker: function(){
             var docEl = this._el.parentNode;
-            var docWidth = Math.max(docEl.offsetWidth, window.innerWidth, docEl.scrollWidth);
-            var docHeight = Math.max(docEl.offsetHeight, window.innerHeight, docEl.scrollHeight);
+            var docWidth = Math.max(docEl.offsetWidth, document.body.clientWidth/*, docEl.scrollWidth*/);
+            var docHeight = Math.max(docEl.offsetHeight, document.body.clientHeight/*, docEl.scrollHeight*/);
             z.dom.css(this._el, {
                 width: docWidth + 'px',
                 height: docHeight + 'px'
             });
         },
         _resizeBody: function(){
-            var viewHeight = window.innerHeight, viewWidth = window.innerWidth;
+            var viewWidth = Math.min(window.innerWidth, document.body.clientWidth),
+                viewHeight = Math.min(window.innerHeight, document.body.clientHeight);
             var docEl = this._el.parentNode;
             var scrollTop = docEl.scrollTop, scrollLeft = docEl.scrollLeft;
             var width = this._imgSize.width;
