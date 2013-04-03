@@ -334,6 +334,15 @@
     this.isUndefined = function(obj){
         return toString.call(obj) === '[object Undefined]';
     }
+
+    this.isBoolean = function(obj){
+        return toString.call(obj) === '[object Boolean]';
+    }
+
+    this.isNumber = function(obj){
+        return toString.call(obj) === '[object Number]';
+    }
+
     
     /**
      * 判断对象或数组是否为空, 如{},[]责返回false
@@ -1008,14 +1017,14 @@
      * @param {Object} commends 命令对象
      * 
      * @example
-     * bindCommends(cmds);
-     * bindCommends(el, cmds);
-     * bindCommends(el, 'click', cmds);
+     * bindCommands(cmds);
+     * bindCommands(el, cmds);
+     * bindCommands(el, 'click', cmds);
      * 
      * function(param, target, event){
      * }
      */
-    this.bindCommends = function(targetElement, eventName, commends){
+    this.bindCommands = function(targetElement, eventName, commends){
         var defaultEvent = 'click';
         if(arguments.length === 1){
             commends = targetElement;
@@ -1044,6 +1053,12 @@
             }
         });
     }
+    /**
+     * 兼容以前的手误…… @2012-7-23
+     * @type {[type]}
+     */
+    this.bindCommends = this.bindCommands;
+
     /**
      * 判断 element 在 reference 中是否可见, reference 必须是 relative 或 absolute  定位, 最好是可滚动的
      * @param  {HTMLElement}  element   
@@ -1575,62 +1590,6 @@
         return result.join("&");
     };
     
-    var templateCache = {};
-      
-    /**
-     * 多行或单行字符串模板处理
-     * 
-     * @method template
-     * @memberOf string
-     * 
-     * @param {String} str 模板字符串
-     * @param {Object} obj 要套入的数据对象
-     * @return {String} 返回与数据对象合成后的字符串
-     * 
-     * @example
-     * <script type="text/html" id="user_tmpl">
-     *   <% for ( var i = 0; i < users.length; i++ ) { %>
-     *     <li><a href="<%=users[i].url%>"><%=users[i].name%></a></li>
-     *   <% } %>
-     * </script>
-     * 
-     * Jx().$package(function(J){
-     *  // 用 obj 对象的数据合并到字符串模板中
-     *  J.template("Hello, {name}!", {
-     *      name:"Kinvix"
-     *  });
-     * };
-     */
-    var template = this.template = function(str, data){
-        // Figure out if we're getting a template, or if we need to
-        // load the template - and be sure to cache the result.
-        var fn = !/\W/.test(str) ?
-          templateCache[str] = templateCache[str] ||
-            template(document.getElementById(str).innerHTML) :
-          
-          // Generate a reusable function that will serve as a template
-          // generator (and which will be cached).
-          new Function("obj",
-            "var z_tmp=[],print=function(){z_tmp.push.apply(z_tmp,arguments);};" +
-            
-            // Introduce the data as local variables using with(){}
-            "with(obj){z_tmp.push('" +
-            
-            // Convert the template into pure JavaScript
-            str
-              .replace(/[\r\t\n]/g, " ")
-              .split("<%").join("\t")
-              .replace(/((^|%>)[^\t]*)'/g, "$1\r")
-              .replace(/\t=(.*?)%>/g, "',$1,'")
-              .split("\t").join("');")
-              .split("%>").join("z_tmp.push('")
-              .split("\r").join("\\'")
-          + "');}return z_tmp.join('');");
-        
-        // Provide some basic currying to the user
-        return data ? fn( data ) : fn;
-    };
-    
     /**
      * 字符串格式函数
      * 
@@ -1648,6 +1607,85 @@
         }
         return str;
     }
+
+    /**
+     * 计算字符串所占的内存字节数，默认使用UTF-8的编码方式计算，也可制定为UTF-16
+     * UTF-8 是一种可变长度的 Unicode 编码格式，使用一至四个字节为每个字符编码
+     * 
+     * 000000 - 00007F(128个代码)      0zzzzzzz(00-7F)                             一个字节
+     * 000080 - 0007FF(1920个代码)     110yyyyy(C0-DF) 10zzzzzz(80-BF)             两个字节
+     * 000800 - 00D7FF 
+       00E000 - 00FFFF(61440个代码)    1110xxxx(E0-EF) 10yyyyyy 10zzzzzz           三个字节
+     * 010000 - 10FFFF(1048576个代码)  11110www(F0-F7) 10xxxxxx 10yyyyyy 10zzzzzz  四个字节
+     * 
+     * 注: Unicode在范围 D800-DFFF 中不存在任何字符
+     * {@link http://zh.wikipedia.org/wiki/UTF-8}
+     * 
+     * UTF-16 大部分使用两个字节编码，编码超出 65535 的使用四个字节
+     * 000000 - 00FFFF  两个字节
+     * 010000 - 10FFFF  四个字节
+     * 
+     * {@link http://zh.wikipedia.org/wiki/UTF-16}
+     * @param  {String} str 
+     * @param  {String} charset utf-8, utf-16
+     * @return {Number}
+     */
+    this.sizeof = function(str, charset){
+        var total = 0,
+            charCode,
+            i,
+            len;
+        charset = charset ? charset.toLowerCase() : '';
+        if(charset === 'utf-16' || charset === 'utf16'){
+            for(i = 0, len = str.length; i < len; i++){
+                charCode = str.charCodeAt(i);
+                if(charCode <= 0xffff){
+                    total += 2;
+                }else{
+                    total += 4;
+                }
+            }
+        }else{
+            for(i = 0, len = str.length; i < len; i++){
+                charCode = str.charCodeAt(i);
+                if(charCode <= 0x007f) {
+                    total += 1;
+                }else if(charCode <= 0x07ff){
+                    total += 2;
+                }else if(charCode <= 0xffff){
+                    total += 3;
+                }else{
+                    total += 4;
+                }
+            }
+        }
+        return total;
+    }
+
+    /**
+     * 检查传入参数是否是空字符串或者是null
+     * @param  {String}  str 
+     * @return {Boolean}     空字符串“”或者null时返回true
+     */
+    this.isEmpty = function(str){
+        if(null == str || '' == str){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 把首字母转换成大写
+     * @param  {String} str 
+     * @return {String}     
+     */
+    this.capital = function(str){
+        if(this.isEmpty(str)){
+            return '';
+        }
+        return str.charAt(0).toUpperCase() + str.substring(1);
+    }
+
 });
 
 ;Z.$package('Z.ui', function(z){
@@ -1791,15 +1829,16 @@
         },
         _resizeMasker: function(){
             var docEl = this._el.parentNode;
-            var docWidth = Math.max(docEl.offsetWidth, window.innerWidth, docEl.scrollWidth);
-            var docHeight = Math.max(docEl.offsetHeight, window.innerHeight, docEl.scrollHeight);
+            var docWidth = Math.max(docEl.offsetWidth, document.body.clientWidth/*, docEl.scrollWidth*/);
+            var docHeight = Math.max(docEl.offsetHeight, document.body.clientHeight/*, docEl.scrollHeight*/);
             z.dom.css(this._el, {
                 width: docWidth + 'px',
                 height: docHeight + 'px'
             });
         },
         _resizeBody: function(){
-            var viewHeight = window.innerHeight, viewWidth = window.innerWidth;
+            var viewWidth = Math.min(window.innerWidth, document.body.clientWidth),
+                viewHeight = Math.min(window.innerHeight, document.body.clientHeight);
             var docEl = this._el.parentNode;
             var scrollTop = docEl.scrollTop, scrollLeft = docEl.scrollLeft;
             var width = this._imgSize.width;

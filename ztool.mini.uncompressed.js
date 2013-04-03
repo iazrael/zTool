@@ -248,6 +248,15 @@
     this.isUndefined = function(obj){
         return toString.call(obj) === '[object Undefined]';
     }
+
+    this.isBoolean = function(obj){
+        return toString.call(obj) === '[object Boolean]';
+    }
+
+    this.isNumber = function(obj){
+        return toString.call(obj) === '[object Number]';
+    }
+
     
     /**
      * 判断对象或数组是否为空, 如{},[]责返回false
