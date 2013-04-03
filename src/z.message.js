@@ -31,9 +31,15 @@
      * @param {Object} model 消息的挂载目标, 可选, 默认为 window
      * @param {String} type 消息类型
      * @param {Function} func 监听函数
+     * @param {Object} context func的执行上下文， 默认为 window
      * func 的调用参数为 ({String}: type, {Object}: message)
+     * @example
+     * addListener(obj, 'evt', func);
+     * addListener(obj, 'evt', func, ctx);
+     * addListener('evt', func);
+     * addListener('evt', func, ctx);
      */
-    var addListener = function(model, type, func) {
+    var addListener = function(model, type, func, context) {
         var listener;
         var wrapFunc;
         var element;
@@ -41,10 +47,14 @@
         var listenerId;
         if(arguments.length < 2){
             throw new Error('addListener arguments not enough');
-        }else if (arguments.length === 2) {
+        }else if(z.isString(model)){
+            context = func;
             func = type;
             type = model;
             model = window;
+        }
+        if(!context){
+            context = window;
         }
         if (!model.__listeners) {
             model.__listeners = {};
@@ -65,7 +75,8 @@
         element = getEventElement();
         if (element.addEventListener) {
             wrapFunc = function(e) {
-                func.apply(window, e.params);
+                func.apply(context, e.params);
+                context = null;
             }
             element.addEventListener(listenerId + '-' + type, wrapFunc, false);
         } else {
@@ -75,7 +86,8 @@
                 //没精力去自己实现顺序执行, 先这样吧
                 var lid = e.params.pop();
                 if (type === e.params[1] && lid === listenerId) {
-                    func.apply(window, e.params);
+                    func.apply(context, e.params);
+                    context = null;
                 }
             }
             element.attachEvent(IE_CUSTOM_EVENT, wrapFunc);
