@@ -21,6 +21,15 @@
             </fileset>
         </concat>
 
+        <concat destfile="${build}/ztool.normal.uncompressed.js" encoding="${charset}" outputencoding="${charset}">
+            <path path="${src}/z.core.js" />
+            <fileset dir="${src}/">
+                <include name="*.js" />
+                <exclude name="z.core.js" />
+                <exclude name="util/*" />
+            </fileset>
+        </concat>
+
         <concat destfile="${build}/ztool.mini.uncompressed.js" encoding="${charset}" outputencoding="${charset}">
             <path path="${src}/z.core.js" />
             <path path="${src}/z.base.js" />
@@ -32,6 +41,9 @@
     <target name="compress" depends="concat">
         <java jar="${lib}/compiler.jar" fork="true">
             <arg line="--charset ${charset} --js='${build}/ztool.all.uncompressed.js' --js_output_file='${build}/ztool.all.js'" />
+        </java>
+        <java jar="${lib}/compiler.jar" fork="true">
+            <arg line="--charset ${charset} --js='${build}/ztool.normal.uncompressed.js' --js_output_file='${build}/ztool.normal.js'" />
         </java>
         <java jar="${lib}/compiler.jar" fork="true">
             <arg line="--charset ${charset} --js='${build}/ztool.mini.uncompressed.js' --js_output_file='${build}/ztool.mini.js'" />
