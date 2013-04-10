@@ -203,6 +203,8 @@
         z.$package = $package;
         z.getPackage = getPackage;
         z.getPackageStatus = getPackageStatus;
+
+        Z = z;
         
     });
     
