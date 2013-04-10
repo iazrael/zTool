@@ -8,7 +8,7 @@
      * @param  {Object} data 
      */
     this.debug = function(data){
-        if(window.console){
+        if(typeof console != 'undefined'){
             console.debug ? console.debug(data) : console.log(data);
         }else{
             //alert(data);

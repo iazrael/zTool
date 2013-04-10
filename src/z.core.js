@@ -7,6 +7,11 @@
         INITED: 3
     };
     var LIBRARY_NAME = 'Z';
+
+    var global = this;
+    if (typeof module != 'undefined'){
+        module.exports = global = {};
+    }
     
     var packageList = {};
     var dependenceQueue = {};
@@ -14,7 +19,7 @@
     var emptyFunction = function(){};
     
     var isDebuging = 0;
-    var debug = isDebuging ? (window.console ? function(data){
+    var debug = isDebuging ? (typeof console != 'undefined' ? function(data){
         console.debug ? console.debug(data) : console.log(data);
     } : emptyFunction) : emptyFunction;
     
@@ -29,7 +34,7 @@
     var buildPackage = function(packageName){
         var pack = packageList[packageName];
         if(!pack){
-            pack = window;
+            pack = global;
             var nameList = packageName.split('.');
             for(var i in nameList){
                 if(!(nameList[i] in pack)){
@@ -54,7 +59,7 @@
             return packageList[packageName];
         }
         var nameList = packageName.split('.');
-        var pack = window;
+        var pack = global;
         for(var i in nameList){
             if(!(nameList[i] in pack)){
                 return undefined;

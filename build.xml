@@ -34,7 +34,6 @@
             <path path="${src}/z.core.js" />
             <path path="${src}/z.base.js" />
             <path path="${src}/z.class.js" />
-            <path path="${src}/z.message.js" />
         </concat>
     </target>
 
