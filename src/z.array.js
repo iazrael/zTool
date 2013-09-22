@@ -83,4 +83,30 @@
         return Array.prototype.slice.call(obj);
     }
 
+    this.forEach = function(array, onEach, onEnd){
+        var keys = null;
+        if(!this.isArray(array)){// 把对象也转换成数组来进行循环
+            if(this.isObject(array)){
+                keys = [];
+                for(var i in array){
+                    if(array.hasOwnProperty(i)){
+                        keys.push(i);
+                    }
+                }
+            }else{
+                throw new Error('not an array or a object');
+            }
+        }
+        var index = -1, count = (keys || array).length;
+        var next = function() {
+            if(++index >= count){
+                onEnd && onEnd(count);
+                return;
+            }
+            var key = keys ? keys[index] : index;
+            onEach && onEach(array[key], key, next);
+        };
+        next();
+    }
+
 });

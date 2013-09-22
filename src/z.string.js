@@ -119,4 +119,9 @@
         return str.charAt(0).toUpperCase() + str.substring(1);
     }
 
+    this.endsWith = function(str, end){
+        var index = str.lastIndexOf(end);
+        return index + end.length == str.length;
+    }
+
 });

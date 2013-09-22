@@ -8,9 +8,10 @@
     };
     var LIBRARY_NAME = 'Z';
 
-    var global = this;
+    var globalContext = this;
     if (typeof module != 'undefined'){
-        module.exports = global = {};
+        module.exports = exports = globalContext = {};
+        globalContext[LIBRARY_NAME] = globalContext;
     }
     
     var packageList = {};
@@ -34,7 +35,7 @@
     var buildPackage = function(packageName){
         var pack = packageList[packageName];
         if(!pack){
-            pack = global;
+            pack = globalContext;
             var nameList = packageName.split('.');
             for(var i in nameList){
                 if(!(nameList[i] in pack)){
@@ -59,7 +60,7 @@
             return packageList[packageName];
         }
         var nameList = packageName.split('.');
-        var pack = global;
+        var pack = globalContext;
         for(var i in nameList){
             if(!(nameList[i] in pack)){
                 return undefined;
@@ -192,20 +193,19 @@
         }else{
             initPackage(pack, requirePackages, constructor);
         }
+        return pack;
     };
     
     /**
      * init the library
      */
-    $package(LIBRARY_NAME, function(z){
+    Z = $package(LIBRARY_NAME, function(z){
         
         z.PACKAGE_STATUS = PACKAGE_STATUS;
         z.$package = $package;
         z.getPackage = getPackage;
         z.getPackageStatus = getPackageStatus;
 
-        Z = z;
-        
     });
     
 })();
@@ -291,6 +291,32 @@
      */
     this.parse = function(obj){
         return Array.prototype.slice.call(obj);
+    }
+
+    this.forEach = function(array, onEach, onEnd){
+        var keys = null;
+        if(!this.isArray(array)){// 把对象也转换成数组来进行循环
+            if(this.isObject(array)){
+                keys = [];
+                for(var i in array){
+                    if(array.hasOwnProperty(i)){
+                        keys.push(i);
+                    }
+                }
+            }else{
+                throw new Error('not an array or a object');
+            }
+        }
+        var index = -1, count = (keys || array).length;
+        var next = function() {
+            if(++index >= count){
+                onEnd && onEnd(count);
+                return;
+            }
+            var key = keys ? keys[index] : index;
+            onEach && onEach(array[key], key, next);
+        };
+        next();
     }
 
 });
@@ -1452,6 +1478,11 @@
             return '';
         }
         return str.charAt(0).toUpperCase() + str.substring(1);
+    }
+
+    this.endsWith = function(str, end){
+        var index = str.lastIndexOf(end);
+        return index + end.length == str.length;
     }
 
 });

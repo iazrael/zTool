@@ -8,9 +8,10 @@
     };
     var LIBRARY_NAME = 'Z';
 
-    var global = this;
+    var globalContext = this;
     if (typeof module != 'undefined'){
-        module.exports = global = {};
+        module.exports = exports = globalContext = {};
+        globalContext[LIBRARY_NAME] = globalContext;
     }
     
     var packageList = {};
@@ -34,7 +35,7 @@
     var buildPackage = function(packageName){
         var pack = packageList[packageName];
         if(!pack){
-            pack = global;
+            pack = globalContext;
             var nameList = packageName.split('.');
             for(var i in nameList){
                 if(!(nameList[i] in pack)){
@@ -59,7 +60,7 @@
             return packageList[packageName];
         }
         var nameList = packageName.split('.');
-        var pack = global;
+        var pack = globalContext;
         for(var i in nameList){
             if(!(nameList[i] in pack)){
                 return undefined;
@@ -192,20 +193,19 @@
         }else{
             initPackage(pack, requirePackages, constructor);
         }
+        return pack;
     };
     
     /**
      * init the library
      */
-    $package(LIBRARY_NAME, function(z){
+    Z = $package(LIBRARY_NAME, function(z){
         
         z.PACKAGE_STATUS = PACKAGE_STATUS;
         z.$package = $package;
         z.getPackage = getPackage;
         z.getPackageStatus = getPackageStatus;
 
-        Z = z;
-        
     });
     
 })();/**
