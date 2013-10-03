@@ -1,14 +1,5 @@
 
-;Z.$package('Z.string', function(z){
-    
-    /**
-     * 
-     * @param {Object} obj 要转换成查询字符串的对象
-     * @return {String} 返回转换后的查询字符串
-     */
-    var toQueryPair = function(key, value) {
-        return encodeURIComponent(String(key)) + "=" + encodeURIComponent(String(value));
-    };
+;zTool.$package('zTool.string', function(z){
     
     /**
      * 
@@ -18,7 +9,7 @@
     this.toQueryString = function(obj){
         var result=[];
         for(var key in obj){
-            result.push(toQueryPair(key, obj[key]));
+            result.push(encodeURIComponent(String(key)) + "=" + encodeURIComponent(String(value)));
         }
         return result.join("&");
     };
@@ -95,17 +86,6 @@
         return total;
     }
 
-    /**
-     * 检查传入参数是否是空字符串或者是null
-     * @param  {String}  str 
-     * @return {Boolean}     空字符串“”或者null时返回true
-     */
-    this.isEmpty = function(str){
-        if(null == str || '' == str){
-            return true;
-        }
-        return false;
-    }
 
     /**
      * 把首字母转换成大写
@@ -113,7 +93,7 @@
      * @return {String}     
      */
     this.capital = function(str){
-        if(this.isEmpty(str)){
+        if(z.isEmpty(str)){
             return '';
         }
         return str.charAt(0).toUpperCase() + str.substring(1);

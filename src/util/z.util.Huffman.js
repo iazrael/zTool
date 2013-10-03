@@ -4,7 +4,7 @@
  *
  * @author http://www.kuederle.com
  */
- ;Z.$package('z.util', function(z){
+;zTool.$package('zTool.util', function(z){
  
     /**
      * The main class used to encode or decode data using Huffman Coding.

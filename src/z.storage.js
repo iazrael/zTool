@@ -1,5 +1,5 @@
 
-;Z.$package('Z.storage', function(z){
+;zTool.$package('zTool.storage', function(z){
 
 
     var Storage = z.$class({

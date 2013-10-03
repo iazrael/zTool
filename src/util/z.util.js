@@ -1,5 +1,5 @@
 
-;Z.$package('Z.util', function(z){
+;zTool.$package('zTool.util', function(z){
     
     //防止 hasOwnProperty 被污染
     var hasOwnProperty = Object.prototype.hasOwnProperty;

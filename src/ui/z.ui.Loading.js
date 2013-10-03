@@ -1,5 +1,5 @@
 
-;Z.$package('Z.ui', function(z){
+;zTool.$package('zTool.ui', function(z){
 
     /**
      * 菊花滚动图 

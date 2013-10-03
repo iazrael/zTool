@@ -1,5 +1,5 @@
 
-;Z.$package('Z.dom', ['Z.string'], function(z){
+;zTool.$package('zTool.dom', function(z){
     
     var packageContext = this;
 
@@ -165,11 +165,6 @@
             }
         });
     }
-    /**
-     * 兼容以前的手误…… @2012-7-23
-     * @type {[type]}
-     */
-    this.bindCommends = this.bindCommands;
 
     /**
      * 判断 element 在 reference 中是否可见, reference 必须是 relative 或 absolute  定位, 最好是可滚动的

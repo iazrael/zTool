@@ -1,5 +1,5 @@
 
-;Z.$package('Z.number', function(z){
+;zTool.$package('zTool.number', function(z){
     
     /**
      * 格式化数字
@@ -92,7 +92,7 @@
                 }
             }
         }
-        return {max: max,min: min};
+        return {max: max, min: min};
     }
 
     /**

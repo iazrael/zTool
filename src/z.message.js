@@ -3,7 +3,7 @@
  * zTool 使用全局的消息通知机制, 需要监听消息的模块调用addListener注册一个回调函数,
  * 当有指定消息到达时触发
  */
-;Z.$package('Z.message', function(z) {
+;zTool.$package('zTool.message', function(z) {
     var IE_CUSTOM_EVENT = 'onpropertychange';
     var IE_EVENT_ELEMENT_STYLE = 'position: absolute; top: -9999em; left: -9999em; width: 0px; height: 0px;';
 

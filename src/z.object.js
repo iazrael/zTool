@@ -1,7 +1,7 @@
 /**
  * 一些最基本的方法, 提供简单的访问方式
  */
-;Z.$package('Z', function(z){
+;zTool.$package('zTool', function(z){
     
     /**
      * 简易的 debug 方法, 没有 console 则不起任何作用
@@ -17,41 +17,41 @@
 
     var toString = Object.prototype.toString;
 
-    this.is = function(type, obj) {
+    var is = this.is = function(obj, type) {
         var clas = toString.call(obj).slice(8, -1);
         return obj !== undefined && obj !== null && clas === type;
     }
     
     this.isString = function(obj){
-        return toString.call(obj) === '[object String]';
+        return is(obj, 'String');
     }
     
     this.isArray = Array.isArray || function(obj){
-        return toString.call(obj) === '[object Array]';
+        return is(obj, 'Array');
     }
     
     this.isArguments = function(obj){
-        return toString.call(obj) === '[object Arguments]';
+        return is(obj, 'Arguments');
     }
     
     this.isObject = function(obj){
-        return toString.call(obj) === '[object Object]';
+        return is(obj, 'Object');
     }
     
     this.isFunction = function(obj){
-        return toString.call(obj) === '[object Function]';
+        return is(obj, 'Function');
     }
     
     this.isUndefined = function(obj){
-        return toString.call(obj) === '[object Undefined]';
+        return is(obj, 'Undefined');
     }
 
     this.isBoolean = function(obj){
-        return toString.call(obj) === '[object Boolean]';
+        return is(obj, 'Boolean');
     }
 
     this.isNumber = function(obj){
-        return toString.call(obj) === '[object Number]';
+        return is(obj, 'Number');
     }
 
     
@@ -60,7 +60,7 @@
      * @param  {Object} 
      * @return {Boolean}
      */
-    this.isEmpty = function(obj){
+    var isEmpty = function(obj){
         if(!obj){
             return false;
         }else if(this.isArray(obj)){
@@ -78,19 +78,19 @@
      * 
      * @param  {Object}  obj         
      * @param  {Object}  relatedObj 被比较的对象
-     * @param {Boolean} isDeep 是否递归比较, 对于属性有 object 的时候, 需要递归比较
+     * @param {Boolean} deep 是否递归比较, 对于属性有 object 的时候, 需要递归比较
      * @return {Boolean} 
      * @example
-     * isSameObject({a: '1', b: 2}, {a: '1', b: 2, c: 'abc'}) === true;
+     * isSame({a: '1', b: 2}, {a: '1', b: 2, c: 'abc'}) === true;
      */
-    var isSameObject = this.isSameObject = function(obj, relatedObj, isDeep){
+    var isSame = function(obj, relatedObj, deep){
         if(obj === relatedObj || (!obj && !relatedObj)){
             return true;
         }
         for(var i in obj){
             if(obj.hasOwnProperty(i)){
-                if(z.isObject(obj[i]) && z.isObject(relatedObj[i]) && isDeep){
-                    if(!isSameObject(obj[i], relatedObj[i], isDeep)){
+                if(z.isObject(obj[i]) && z.isObject(relatedObj[i]) && deep){
+                    if(!isSame(obj[i], relatedObj[i], deep)){
                         return false;
                     }
                 }else if(obj[i] !== relatedObj[i]){
@@ -163,7 +163,7 @@
      * @example
      * function parent(){
      * }
-     * parent.prototype {};
+     * parent.prototype = {};
      * function child(){
      * }
      * child.prototype = {};
@@ -174,6 +174,9 @@
         child.prototype = merge({}, parent.prototype, child.prototype);
         child.prototype.constructor = child;
     }
+
+    this.isEmpty = isEmpty;
+    this.isSame = isSame;
 
     this.merge = merge;
     this.duplicate = duplicate;

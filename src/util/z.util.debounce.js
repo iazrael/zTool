@@ -1,5 +1,5 @@
 
-;Z.$package('Z.util', function(z){
+;zTool.$package('zTool.util', function(z){
     
     /**
      * 返回一个方法, 在一段时间内多次调用只执行一次

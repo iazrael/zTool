@@ -1,5 +1,5 @@
 
-;Z.$package('Z.date', function(z){
+;zTool.$package('zTool.date', function(z){
     
     /**
      * 格式化日期

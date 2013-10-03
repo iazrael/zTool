@@ -1,5 +1,5 @@
 
-;Z.$package('Z.dom', function(z){
+;zTool.$package('zTool.dom', function(z){
 
     var ELLIPSIS_TEMP_STYLE = 'position: absolute;left: -99999em;width: auto !important;';
     /**

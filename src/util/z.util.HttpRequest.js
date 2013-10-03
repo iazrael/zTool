@@ -1,5 +1,5 @@
 
-;Z.$package('Z.util', ['Z.message', 'Z.string', 'Z.util'], function(z){
+;zTool.$package('zTool.util', ['Z.message', 'Z.string', 'Z.util'], function(z){
     
     /**
      * Http请求的缓存封装

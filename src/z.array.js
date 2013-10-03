@@ -1,5 +1,5 @@
 
-;Z.$package('Z.array', function(z){
+;zTool.$package('zTool.array', function(z){
     
     /**
      * 从给定数组移除指定元素, 只删除一个

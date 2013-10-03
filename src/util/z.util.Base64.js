@@ -7,7 +7,7 @@
 *  @email  tuhaitao@foxmail.com 
 * 
 */  
-;Z.$package('z.util.Base64', function(z){
+;zTool.$package('zTool.util.Base64', function(z){
     
 
     // private property

@@ -1,5 +1,5 @@
 
-;Z.$package('Z.browser', function(z){
+;zTool.$package('zTool.browser', function(z){
     var packageContext = this;
     
     (function(){

@@ -1,5 +1,5 @@
 
-;Z.$package('Z.cookie', function(z){
+;zTool.$package('zTool.cookie', function(z){
 
     var defaultDomain = window.location.host;
     

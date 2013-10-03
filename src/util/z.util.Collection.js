@@ -1,5 +1,5 @@
 
-;Z.$package('Z.util', ['Z.message', 'Z.array'], function(z){
+;zTool.$package('zTool.util', function(z){
     
     /**
      * 通用 collection 类

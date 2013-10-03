@@ -1,5 +1,5 @@
 
-;Z.$package('Z.file', function(z){
+;zTool.$package('zTool.file', function(z){
 
     var IMAGE_NOT_LOAD = 0;
     var IMAGE_LOADING = 1;

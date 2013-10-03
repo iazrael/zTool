@@ -1,5 +1,5 @@
 
-;Z.$package('Z.util', function(z){
+;zTool.$package('zTool.util', function(z){
     
     var pointList = {};
     var console = window.console;
@@ -9,7 +9,7 @@
      * 传入的 console 只需实现一个log方法即可
      * @param {Object} console 日志类
      */
-    this.setTimeTakenLog = function(logObj){
+    this.redirect = function(logObj){
         console = logObj;
     }
 
