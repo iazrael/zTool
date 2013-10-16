@@ -5,9 +5,9 @@
     }
 })('zTool', function(){
 
-    var globalContext = this;
+    var context = this;
 
-    var context = {
+    var exports = {
         varsion: '1.0',
         author: 'azrael'
     };
@@ -17,7 +17,7 @@
      * @param {String} packageName
      */
     var buildPackage = function(packageName){
-        var pack =  globalContext;
+        var pack = context;
         var nameList = packageName.split('.');
         for(var i in nameList){
             if(!(nameList[i] in pack)){
@@ -34,9 +34,9 @@
      * @param  {Function} initFunc    
      */
     context.$package = function(packageName, initFunc){
-        var pack = packageName ? buildPackage(packageName) : globalContext;
-        initFunc.call(pack, context);
+        var pack = packageName ? buildPackage(packageName) : context;
+        initFunc.call(pack, exports);
     };
 
-    return context;
+    return exports;
 });
